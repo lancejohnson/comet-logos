@@ -357,3 +357,4 @@ const imgs = [...document.querySelectorAll('#reel img')]; let ri = 0;
 setInterval(() => { if (document.body.classList.contains('chatting')) return; const o = imgs[ri]; o.classList.remove('on'); o.classList.add('out'); setTimeout(() => o.classList.remove('out'), 700); ri = (ri + 1) % imgs.length; imgs[ri].classList.add('on'); }, 2600);
 $('navlogo').innerHTML = window.LOGOS?.ss_clean ? LOGOS.ss_clean.html({ink: '#0F1222', accent: '#2F4BFF', size: 22}) : '<b>Comet</b>';
 const hd = location.hash.match(/d=([a-z0-9]+)/); if (hd) restore(hd[1]);
+else if (location.hash === '#pricing') { history.replaceState(null, '', location.pathname); add('me', 'Get pricing'); say('<p>Here are the sizes and sample prices. Paste your website any time and I’ll put your own design on it.</p>'); priceCard(); }
