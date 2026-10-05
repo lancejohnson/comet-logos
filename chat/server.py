@@ -347,7 +347,8 @@ class H(BaseHTTPRequestHandler):
         u = urllib.parse.urlparse(self.path); p = u.path
         if p in ('/', '/index.html'): return self.file(os.path.join(STATIC, 'index.html'))
         if p.startswith('/static/'): return self.file(os.path.join(STATIC, os.path.basename(p)))
-        if p.startswith('/site/img/'): return self.file(os.path.join(REPO, 'site', 'img', os.path.basename(p)))
+        m = re.fullmatch(r'/site/img/((?:pc/)?[\w-]+\.webp)', p)
+        if m: return self.file(os.path.join(REPO, 'site', 'img', m.group(1)))
         if re.fullmatch(r'/logos\d?\.js', p): return self.file(os.path.join(REPO, p[1:]))
         m = re.fullmatch(r'/files/([a-z0-9]+)/([a-z0-9]+\.(?:jpg|png))', p)
         if m: return self.file(os.path.join(ddir(m.group(1)), m.group(2)))
