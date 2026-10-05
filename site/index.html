@@ -19,7 +19,7 @@ main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:0 20px;display:flex
 .reel img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transform:translateX(24px);transition:opacity .7s ease,transform .7s ease}
 .reel img.on{opacity:1;transform:none}
 .reel img.out{opacity:0;transform:translateX(-24px)}
-.dots{display:flex;gap:6px;margin:6px 0 18px}
+.dots{display:flex;gap:6px;margin:6px 0 18px}.dots[hidden]{display:none}.reel{margin-bottom:22px}
 .dots button{width:6px;height:6px;border-radius:50%;background:#D6D6D6;padding:0}
 .dots button.on{background:var(--accent);width:18px;border-radius:3px}
 .ctas{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:22px}
@@ -139,11 +139,11 @@ body:not(.has-chat) .composer{display:none}
 <main>
  <div class="intro">
   <div class="reel" id="reel">
-   <img class="on" src="img/p14.webp" alt="Video brochure design">
-   <img src="img/p12.webp" alt=""><img src="img/p10.webp" alt=""><img src="img/p8.webp" alt=""><img src="img/p7.webp" alt="">
-   <img src="img/p3.webp" alt=""><img src="img/p15.webp" alt=""><img src="img/p13.webp" alt=""><img src="img/p4.webp" alt=""><img src="img/p6.webp" alt="">
+   <img class="on" src="img/p12.webp" alt="Netflix video brochure">
+   <img src="img/p10.webp" alt=""><img src="img/p8.webp" alt=""><img src="img/p3.webp" alt=""><img src="img/p7.webp" alt="">
+   <img src="img/p15.webp" alt=""><img src="img/p13.webp" alt=""><img src="img/p4.webp" alt="">
   </div>
-  <div class="dots" id="dots"></div>
+  <div class="dots" id="dots" hidden></div>
   <div class="copy">
   <p>Video brochures, designed and priced online.</p>
   <div class="ctas">
@@ -178,7 +178,7 @@ const chat=()=>document.body.classList.add('has-chat');
 const DES=['p8','p10','p13'];
 function designs(name){
  return add('bot',`<p>Here are three designs for ${name}. Pick one, or tell me what to change.</p>
-  <div class="designs">${DES.map((s,i)=>`<button class="${i===st.design?'on':''}" data-d="${i}"><img src="img/${s}.png" alt="">Design ${i+1}</button>`).join('')}</div>
+  <div class="designs">${DES.map((s,i)=>`<button class="${i===st.design?'on':''}" data-d="${i}"><img src="img/${s}.webp" alt="">Design ${i+1}</button>`).join('')}</div>
   <div class="follow"><button data-f="See design 1 in 3D">See it in 3D</button><button data-f="Make it darker">Make it darker</button><button data-f="Use a photo on the cover">Photo cover</button><button data-f="Change the headline">Change the headline</button></div>`);
 }
 function prices(lead){priceEl=add('bot',`<p>${lead}</p>${priceBlock()}`);priceEl.dataset.lead=lead}
@@ -190,7 +190,7 @@ function reply(text,kind){
   if(kind==='200'){designs('your trade show');st.qi=3;
    prices(`I priced 250 instead of 200, because 250 costs less in total.`);
    add('bot',`<div class="tip">200 brochures at ${m(SIZE[st.size][2])} each is ${m(SIZE[st.size][2]*200)}. 250 is the next price break, at ${m(SIZE[st.size][3])} each, so 250 costs ${m(SIZE[st.size][3]*250)} in total. That is less than 200.</div>`);return}
-  if(kind==='follow'){add('bot',`<p>Done. Here is design ${st.design+1} in 3D. Drag to turn it.</p><img class="big3d" src="img/${DES[st.design]}.png" alt="">`);return}
+  if(kind==='follow'){add('bot',`<p>Done. Here is design ${st.design+1} in 3D. Drag to turn it.</p><img class="big3d" src="img/${DES[st.design]}.webp" alt="">`);return}
   const site=(text.match(/[\w-]+\.(com|io|co|net|org|ai|us)\b/)||[])[0];
   if(kind==='price'||(/cost|price|how much/i.test(text)&&!site)){prices('Pick a size and quantity. The price per brochure drops at each step.');return}
   designs(site||'your brand');prices('How many do you need?');
