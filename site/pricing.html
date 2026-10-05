@@ -54,32 +54,35 @@ main{max-width:1180px;margin:0 auto;padding:20px 24px 60px;display:grid;grid-tem
   <div class="group"><h3>Brochure size</h3><div class="opts" id="paper"></div></div>
   <div class="group"><h3>Screen size</h3><div class="opts" id="screen"></div></div>
   <p class="note" id="note"></p>
+  <div class="group"><h3>Cover</h3><div class="opts" id="cover"></div></div>
   <div class="group"><h3>Quantity</h3><div class="qty" id="qty"></div></div>
   <div class="total" id="total"></div>
   <button class="cta">Start my order</button>
-  <p class="fine">Mock-up. Sizes and prices are placeholders until we load Alan’s options.</p>
+  <p class="fine">Mock-up. Sizes are Allen’s options (business card, A5, A4). Prices are placeholders, not final.</p>
  </section>
 </main>
 <script>
-// ---- Data (millimetres). Swap these when Alan's list is in. ----
+// ---- Data (millimetres) ----
+// Sizes from Allen Meihao's quote (Shenzhen Meihao Packing, 7 Nov 2024). Each brochure size
+// takes only the screens Allen offers for it. Prices below are placeholder retail, NOT Allen's cost.
 const PAPER=[ // closed size, landscape, opens like a book
- {id:'card',name:'Business card',w:89,h:51,add:0,def:'2.4'},
- {id:'a6',name:'A6 postcard',w:148,h:105,add:0,def:'5'},
- {id:'a5',name:'A5',w:210,h:148,add:0,def:'7'},
- {id:'a4',name:'A4',w:297,h:210,add:4,def:'10.1'},
+ {id:'card',name:'Business card',w:89,h:51,def:'2.4',screens:['2.4']},
+ {id:'a5',name:'A5',w:210,h:148,def:'7',screens:['4.5','5','7']},
+ {id:'a4',name:'A4',w:297,h:210,def:'10',screens:['10']},
 ];
-const SCREEN=[ // w×h of the visible picture
+const SCREEN=[ // w×h of the visible picture, mm (7- and 10-inch from Allen's dielines)
  {id:'2.4',name:'2.4-inch',w:48.8,h:36.6,p:[29,22,17,13,11,9]},
- {id:'4.3',name:'4.3-inch',w:95.2,h:53.6,p:[42,33,27,22,18,15]},
+ {id:'4.5',name:'4.5-inch',w:99.6,h:56,p:[44,35,28,23,19,16]},
  {id:'5',name:'5-inch',w:110.7,h:62.3,p:[48,38,31,25,21,17]},
- {id:'7',name:'7-inch',w:155,h:87.2,p:[64,50,38,29,23,18]},
- {id:'10.1',name:'10.1-inch',w:217.6,h:136,p:[108,90,76,64,58,54]},
+ {id:'7',name:'7-inch',w:152,h:85,p:[64,50,38,29,23,18]},
+ {id:'10',name:'10-inch',w:221,h:124,p:[108,90,76,64,58,54]},
 ];
+const COVER=[['soft','Softcover',[0,0,0,0,0,0]],['hard','Hardcover',[4,3,2,1,1,1]]];
 const QTY=[25,50,100,250,500,1000];
-const st={paper:'a5',screen:'7',qi:3,view:0,mode:'closed'};
+const st={paper:'a5',screen:'7',qi:3,view:0,mode:'closed',cover:'hard'};
 const IN=25.4, inch=mm=>(mm/IN).toFixed(1).replace(/\.0$/,'');
 const P=()=>PAPER.find(p=>p.id===st.paper), S=()=>SCREEN.find(s=>s.id===st.screen);
-const fits=(p,s)=>s.w<=p.w-10&&s.h<=p.h-10&&(s.h+16<=p.h-6||s.w+16<=p.w-8);
+const fits=(p,s)=>p.screens.includes(s.id);
 const money=n=>'$'+n.toLocaleString('en-US',{maximumFractionDigits:0});
 const IMG={cover:'tex/Netflix-front.jpg',inl:'tex/Netflix-inl.jpg'};
 
@@ -145,6 +148,7 @@ function brochureClosed(x,y,p,s){
  return `<g><defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${p.w}" height="${p.h}" rx="1"/></clipPath></defs>
  <rect x="${x+2}" y="${y+3}" width="${p.w}" height="${p.h}" rx="1.5" fill="rgba(0,0,0,.22)" filter="url(#blur)"/>
  <image href="${IMG.cover}" x="${x}" y="${y}" width="${p.w}" height="${p.h}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id})"/>
+ ${st.cover==='hard'?`<rect x="${x+.6}" y="${y+.6}" width="${p.w-1.2}" height="${p.h-1.2}" rx="1" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".8"/><rect x="${x}" y="${y+p.h-1.6}" width="${p.w}" height="1.6" fill="rgba(0,0,0,.45)"/>`:''}
  ${st.mode==='closed'?`<rect x="${sx}" y="${sy}" width="${s.w}" height="${s.h}" rx="1" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width=".9" stroke-dasharray="3 2"/>
  <text x="${sx+s.w/2}" y="${sy+s.h/2+fs*.35}" font-family="Archivo" font-weight="700" font-size="${fs}" fill="#fff" text-anchor="middle">${s.name.replace('-inch','″')} screen inside</text>`:''}</g>`;
 }
@@ -182,7 +186,7 @@ const VIEWS=[
     a+=label(ox+q.w-3,oy-q.h+10,q.name,{a:'end',s:8.5,c:on||inside?'#fff':'#777',w:on?800:500});
    });
    a+=`<rect x="${ox}" y="${oy-71.6}" width="147.6" height="71.6" rx="10" fill="none" stroke="#2F4BFF" stroke-width="1.1" stroke-dasharray="4 3"/>`+label(ox+4,oy-74.5,'iPhone 16',{s:8,c:'#2F4BFF',w:700});
-   const R=250,ry=oy;let b=`<rect x="10" y="${ry-136}" width="217.6" height="136" fill="#fff"/><rect x="10" y="${ry-s.h}" width="${s.w}" height="${s.h}" fill="#0b0b0b"/><line x1="10" y1="${ry}" x2="${10+s.w}" y2="${ry-s.h}" stroke="#E50914" stroke-width="1.2"/>`;
+   const R=250,ry=oy;let b=`<rect x="10" y="${ry-124}" width="221" height="124" fill="#fff"/><rect x="10" y="${ry-s.h}" width="${s.w}" height="${s.h}" fill="#0b0b0b"/><line x1="10" y1="${ry}" x2="${10+s.w}" y2="${ry-s.h}" stroke="#E50914" stroke-width="1.2"/>`;
    SCREEN.slice().reverse().forEach(q=>{const on=q.id===s.id, inside=q.w<s.w;
     b+=`<rect x="10" y="${ry-q.h}" width="${q.w}" height="${q.h}" fill="none" stroke="${on?'#111':inside?'rgba(255,255,255,.45)':'#bbb'}" stroke-width=".8"/>`;
     b+=label(10+q.w-3,ry-q.h+9,q.name.replace('-inch','″'),{a:'end',s:8,c:on||inside?'#fff':'#777',w:on?800:500});
@@ -209,8 +213,10 @@ function render(){
  document.getElementById('cap').innerHTML=`<span>Closed <b>${inch(p.w)} × ${inch(p.h)} in</b></span><span>Open <b>${inch(p.w*2)} × ${inch(p.h)} in</b></span><span>Picture <b>${inch(s.w)} × ${inch(s.h)} in</b></span>`;
  document.getElementById('paper').innerHTML=PAPER.map(q=>`<button class="${q.id===p.id?'on':''}" data-paper="${q.id}"><b>${q.name}</b><small>${inch(q.w)} × ${inch(q.h)} in</small></button>`).join('');
  document.getElementById('screen').innerHTML=SCREEN.map(q=>{const ok=fits(p,q),need=PAPER.find(x=>fits(x,q));
-  return `<button class="${q.id===s.id?'on':''} ${ok?'':'off'}" data-screen="${q.id}"><b>${q.name}</b><small>${ok?`${inch(q.w)} × ${inch(q.h)} in`:`needs ${need.name}`}</small></button>`}).join('');
- const u=s.p[st.qi]+p.add, n=QTY[st.qi];
+  return `<button class="${q.id===s.id?'on':''} ${ok?'':'off'}" data-screen="${q.id}"><b>${q.name}</b><small>${ok?`${inch(q.w)} × ${inch(q.h)} in`:`${need.name} only`}</small></button>`}).join('');
+ const cv=COVER.find(c=>c[0]===st.cover);
+ document.getElementById('cover').innerHTML=COVER.map(([k,t,a])=>`<button class="${k===st.cover?'on':''}" data-cover="${k}"><b>${t}</b><small>${k==='soft'?'Flexible card cover':'Rigid, more premium'}</small></button>`).join('');
+ const u=s.p[st.qi]+cv[2][st.qi], n=QTY[st.qi];
  document.getElementById('qty').innerHTML=QTY.map((q,i)=>`<button class="${i===st.qi?'on':''}" data-qi="${i}">${q.toLocaleString()}</button>`).join('');
  document.getElementById('total').innerHTML=`<b>${money(u*n)}</b><span>${n.toLocaleString()} brochures · ${money(u)} each</span>`;
 }
@@ -218,10 +224,11 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
  if(d.view)st.view=+d.view;
  if(d.mode)st.mode=d.mode;
  if(d.paper){st.paper=d.paper;st.screen=P().def}
- if(d.screen){st.screen=d.screen;const s=S();if(!fits(P(),s)){const nb=PAPER.find(x=>fits(x,s));note=`A ${s.name} screen needs a bigger brochure, so the size is now ${nb.name}.`;st.paper=nb.id}}
+ if(d.screen){st.screen=d.screen;const s=S();if(!fits(P(),s)){const nb=PAPER.find(x=>fits(x,s));note=`The ${s.name} screen comes in the ${nb.name} size, so the brochure is now ${nb.name}.`;st.paper=nb.id}}
  if(d.qi)st.qi=+d.qi;
+ if(d.cover)st.cover=d.cover;
  if(d.paper||d.screen)document.getElementById('note').textContent=note;
- if(d.mode||d.view||d.paper||d.screen||d.qi)render();
+ if(d.cover||d.mode||d.view||d.paper||d.screen||d.qi)render();
 });
 const m=location.hash.match(/^#([a-d])(open|stacked)?$/i);if(m){st.view='abcd'.indexOf(m[1].toLowerCase());if(m[2])st.mode=m[2].toLowerCase()}
 render();
