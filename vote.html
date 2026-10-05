@@ -1,0 +1,175 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comet logos: pick the ones you like</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=block" rel="stylesheet">
+<script src="logos.js"></script><script src="logos2.js"></script><script src="logos3.js"></script><script src="logos4.js"></script><script src="logos5.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#F6F5F2;color:#111;font:400 16px/1.5 Archivo,sans-serif;padding-bottom:110px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+header{padding:40px 0 18px}
+h1{font:700 32px/1.1 Archivo;letter-spacing:-.02em}
+header p{color:#555;margin-top:8px;max-width:680px}
+.banner{display:none;margin-top:16px;background:#111;color:#fff;border-radius:12px;padding:14px 16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.banner.on{display:flex}
+.banner button{background:#fff;color:#111;border-radius:999px;padding:8px 14px;font-weight:600;font-size:14px}
+.bar{position:sticky;top:0;z-index:5;background:rgba(246,245,242,.95);backdrop-filter:blur(8px);border-bottom:1px solid #e4e2dc;padding:12px 0}
+.bar .wrap{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.bar .k{font-size:13px;color:#777;margin:0 4px 0 6px;flex:none}
+.bar .k:first-child{margin-left:0}
+.pill{flex:none;display:flex;align-items:center;gap:7px;border:1px solid #d8d6d0;background:#fff;border-radius:999px;padding:6px 12px;font-size:14px;white-space:nowrap}
+.pill i{width:16px;height:16px;border-radius:50%;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.pill.on{border-color:#111;box-shadow:inset 0 0 0 1px #111}
+.sep{flex:none;width:1px;height:24px;background:#d8d6d0;margin:0 6px}
+h2{font:700 20px Archivo;margin:34px 0 4px}
+.sub{color:#666;font-size:15px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:#fff;border:2px solid transparent;border-radius:16px;overflow:hidden;box-shadow:0 1px 0 #e4e2dc;transition:border-color .15s,opacity .15s}
+.card.y{border-color:#1A9E55}
+.card.n{opacity:.5}
+.card .main{height:170px;display:grid;place-items:center;padding:10px;overflow:hidden}
+.card .row{display:grid;grid-template-columns:1.7fr 1fr;height:96px}
+.card .dark{display:grid;place-items:center;overflow:hidden}
+.card .ic{display:grid;place-items:center;background:#EFEDE8}
+.card .app{width:58px;height:58px;border-radius:14px;display:grid;place-items:center;box-shadow:0 5px 14px rgba(0,0,0,.18)}
+.card .cap{padding:12px 16px 4px}
+.card .cap b{font-weight:700}
+.card .cap p{color:#666;font-size:14px;line-height:1.4;margin-top:2px;min-height:39px}
+.vote{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px 16px}
+.vote button{border:1px solid #d8d6d0;border-radius:10px;padding:11px 8px;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:6px}
+.vote .like.on{background:#1A9E55;border-color:#1A9E55;color:#fff}
+.vote .nope.on{background:#111;border-color:#111;color:#fff}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid #e4e2dc;box-shadow:0 -6px 20px rgba(0,0,0,.06)}
+.dock .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;padding-bottom:14px}
+.dock .count{font-size:15px;color:#444}
+.dock .count b{color:#111}
+.dock .send{background:#111;color:#fff;border-radius:999px;padding:12px 20px;font-weight:700;font-size:15px;white-space:nowrap}
+.dock .send:disabled{opacity:.35;cursor:default}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;border-radius:10px;padding:10px 14px;font-size:14px;display:none;max-width:90vw;z-index:9}
+.toast.on{display:block}
+dialog{border:0;border-radius:16px;padding:22px;max-width:420px;width:calc(100% - 32px);margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+dialog h3{font:700 20px Archivo;margin-bottom:6px}
+dialog p{color:#555;font-size:15px;margin-bottom:12px}
+dialog input{width:100%;font:inherit;border:1px solid #ccc;border-radius:10px;padding:11px 12px;margin-bottom:12px}
+dialog .link{font-size:13px;word-break:break-all;background:#F4F3EF;border-radius:8px;padding:10px;margin-bottom:12px;display:none}
+dialog .btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+dialog .btns button{border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid #d8d6d0}
+dialog .btns .pri{background:#111;color:#fff;border-color:#111}
+@media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.bar .wrap{flex-wrap:wrap;row-gap:8px}.sep{display:none}.bar .k{min-width:46px}.wrap{padding:0 14px}h1{font-size:25px}.grid{grid-template-columns:1fr}.card .main{height:150px}}
+</style></head><body>
+<header><div class="wrap"><h1>Comet logos: which do you like?</h1>
+<p>Tap <b>Like</b> or <b>Not for me</b> on each logo. When you're done, tap <b>Send my picks</b> to get a link that shows your choices to anyone you send it to.</p>
+<div class="banner" id="banner"><span id="bannerText"></span><button id="mine">Make my own picks</button></div></div></header>
+<div class="bar"><div class="wrap" id="bar"></div></div>
+<main class="wrap" id="list"></main>
+<div class="dock"><div class="wrap"><div class="count" id="count"></div><button class="send" id="send">Send my picks</button></div></div>
+<div class="toast" id="toast"></div>
+<dialog id="dlg"><h3>Send your picks</h3><p>Add your name so people know whose picks these are.</p>
+<input id="who" placeholder="Your name" autocomplete="given-name">
+<div class="link" id="linkBox"></div>
+<div class="btns"><button id="cancel">Close</button><button class="pri" id="go">Copy link</button></div></dialog>
+<script>
+const PAL=[
+ {k:'cobalt',n:'Cobalt',ink:'#0F1222',accent:'#2F4BFF',night:'#0F1222',dark:'#6F86FF'},
+ {k:'amber',n:'Amber',ink:'#17140E',accent:'#E89A00',night:'#17140E',dark:'#FFB423'},
+ {k:'mono',n:'Black only',ink:'#111111',accent:'#111111',night:'#111111',dark:'#FFFFFF'},
+];
+const GROUPS=[
+ ['Earlier favourites','The six logos picked in the last round.',[
+  ['ss_clean','Shooting Star','Solid tail and round head.'],
+  ['ss_twotone','Two-Tone Tail','Tail in the text colour, head in colour.'],
+  ['ss_speed','Speed Lines','A head with three trailing lines.'],
+  ['trail','Dot Trail','A comet made of four shrinking dots.'],
+  ['playc','Play C','Heavy C with a play button inside.'],
+  ['tile','Tile','Square icon with a c and a dot.']]],
+ ['Serif styles','Classic letterforms: editorial, warm, or premium.',[
+  ['sf_italic','Editorial Italic','Magazine-style italic. The full stop is a small comet.'],
+  ['sf_soft','Soft Serif','Heavy rounded serif with a twinkle over the t.'],
+  ['sf_didone','Classic Caps','Elegant capitals under a hairline comet.'],
+  ['garamond','Garamond Streak','Bookish italic. The t’s crossbar flies off as a comet.'],
+  ['orbit_serif','Ringed O','Bold display serif. The o wears a planet’s ring.'],
+  ['seal','Seal','Round badge, like a stamp or a sticker.']]],
+ ['Other moods','Retro, playful, sporty and techy.',[
+  ['script','Retro Script','1950s sign script with a shooting-star swash.'],
+  ['deco','Art Deco','Spaced capitals under a fan of rays. 1920s glamour.'],
+  ['label','Slab Label','Slab serif printed on a solid tag.'],
+  ['film','Film Strip','Capitals cut out of a strip of film.'],
+  ['wide','Wide','Extra-wide capitals with speed slashes.'],
+  ['bubble','Bubble','Chunky rounded letters and a soft comet.'],
+  ['marker','Marker','Hand-lettered, with a doodled comet.'],
+  ['neon','Neon Lines','1980s lettering drawn in parallel lines.'],
+  ['pixel','Arcade','Pixel letters and an 8-bit comet.'],
+  ['mono','Terminal','Monospace with a typing cursor.']]],
+];
+const ALL=GROUPS.flatMap(g=>g[2]);
+const $=id=>document.getElementById(id);
+const store={get(){try{return JSON.parse(localStorage.getItem('cometVotes')||'{}')}catch(_){return{}}},set(v){try{localStorage.setItem('cometVotes',JSON.stringify(v))}catch(_){}}};
+// Shared view: #by=Name&v=key.y,key.n&c=cobalt
+const hp=new URLSearchParams(location.hash.slice(1));
+let viewing=null;
+if(hp.get('v')){const v={};hp.get('v').split(',').forEach(x=>{const [k,d]=x.split('.');if(k&&(d==='y'||d==='n'))v[k]=d});viewing={by:hp.get('by')||'Someone',votes:v}}
+let votes=viewing?viewing.votes:store.get();
+let cur=PAL.find(p=>p.k===hp.get('c'))||PAL[0];
+let filter=viewing?'y':'all';
+
+function logo(k,p,{size=40,dark=false}={}){return LOGOS[k].html({ink:dark?'#fff':p.ink,accent:dark?p.dark:p.accent,size})}
+function icon(k,p,s){const L=LOGOS[k];
+ if(k==='tile')return L.tileSvg(p.dark,s,p.night,'#fff');
+ if(k==='playc')return L.mark('#fff',s,p.dark);
+ if(k==='ss_twotone')return L.icon(p.dark,s,'#fff');
+ return L.icon(p.dark,s);}
+const SIZE={sf_didone:34,deco:36,seal:32,wide:38,label:38,film:36,neon:36,pixel:38,garamond:40,sf_italic:40,marker:38};
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+function bar(){
+ const filters=[['all','All'],['y','Liked'],['n','Not for me'],['u','Not rated yet']];
+ $('bar').innerHTML='<span class="k">Show</span>'+filters.map(([k,n])=>`<button class="pill ${filter===k?'on':''}" data-f="${k}">${n}</button>`).join('')+
+  '<span class="sep"></span><span class="k">Colour</span>'+PAL.map(p=>`<button class="pill ${p===cur?'on':''}" data-c="${p.k}"><i style="background:${p.accent}"></i>${p.n}</button>`).join('');
+}
+function card([k,n,d]){
+ const v=votes[k]||'';const s=SIZE[k]||42;
+ return `<div class="card ${v}" data-k="${k}"><div class="main">${logo(k,cur,{size:s})}</div>
+ <div class="row"><div class="dark" style="background:${cur.night}">${logo(k,cur,{size:Math.round(s*.55),dark:true})}</div>
+ <div class="ic"><div class="app" style="background:${cur.night}">${icon(k,cur,38)}</div></div></div>
+ <div class="cap"><b>${n}</b><p>${d}</p></div>
+ ${viewing?'':`<div class="vote"><button class="like ${v==='y'?'on':''}" data-v="y">♥ Like</button><button class="nope ${v==='n'?'on':''}" data-v="n">✕ Not for me</button></div>`}</div>`;
+}
+function draw(){
+ bar();
+ const keep=([k])=>filter==='all'||(filter==='u'?!votes[k]:votes[k]===filter);
+ let any=false;
+ $('list').innerHTML=GROUPS.map(([t,sub,items])=>{const shown=items.filter(keep);if(!shown.length)return'';any=true;
+  return `<h2>${t}</h2><p class="sub">${sub}</p><div class="grid">${shown.map(card).join('')}</div>`}).join('')+(any?'':`<p style="color:#777;padding:30px 0">Nothing here yet.</p>`);
+ const y=ALL.filter(([k])=>votes[k]==='y').length,n=ALL.filter(([k])=>votes[k]==='n').length;
+ $('count').innerHTML=viewing?`<b>${esc(viewing.by)}</b> liked <b>${y}</b>, passed on <b>${n}</b>`:`Liked <b>${y}</b> · Not for me <b>${n}</b> · ${ALL.length-y-n} to go`;
+ $('send').textContent=viewing?'Make my own picks':'Send my picks';
+ $('send').disabled=!viewing&&!(y+n);
+ if(viewing){$('banner').classList.add('on');$('bannerText').textContent=`You're looking at ${viewing.by}'s picks, showing the ones they liked. Tap "All" or "Not for me" to see the rest.`}
+ else $('banner').classList.remove('on');
+}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2600)}
+function startOwn(){viewing=null;votes=store.get();filter='all';try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}draw();scrollTo(0,0)}
+function shareLink(){
+ const name=$('who').value.trim()||'Someone';try{localStorage.setItem('cometName',name)}catch(_){}
+ const v=ALL.filter(([k])=>votes[k]).map(([k])=>k+'.'+votes[k]).join(',');
+ const h=new URLSearchParams({by:name,v,c:cur.k}).toString();
+ return location.href.split('#')[0]+'#'+h;
+}
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.f){filter=b.dataset.f;draw();return}
+ if(b.dataset.c){cur=PAL.find(p=>p.k===b.dataset.c);draw();return}
+ if(b.dataset.v){const k=b.closest('.card').dataset.k;if(votes[k]===b.dataset.v)delete votes[k];else votes[k]=b.dataset.v;store.set(votes);draw();return}
+ if(b.id==='mine'){startOwn();return}
+ if(b.id==='send'){if(viewing){startOwn();return}try{$('who').value=localStorage.getItem('cometName')||''}catch(_){}$('linkBox').style.display='none';$('go').textContent='Copy link';$('dlg').showModal();return}
+ if(b.id==='cancel'){$('dlg').close();return}
+ if(b.id==='go'){const url=shareLink();$('linkBox').textContent=url;$('linkBox').style.display='block';
+  if(navigator.share&&matchMedia('(pointer:coarse)').matches){try{await navigator.share({title:'My Comet logo picks',url});return}catch(_){}}
+  try{await navigator.clipboard.writeText(url);$('go').textContent='Copied ✓';toast('Link copied. Paste it into a text or email.')}catch(_){
+   const r=document.createRange();r.selectNodeContents($('linkBox'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('go').textContent='Copy the link above'}}
+});
+addEventListener('DOMContentLoaded',draw);
+</script></body></html>
