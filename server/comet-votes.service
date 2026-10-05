@@ -1,0 +1,17 @@
+[Unit]
+Description=Comet logo votes (app.whiteboardgeeks.com/comet-votes/)
+After=network.target
+
+[Service]
+Environment=PORT=8120
+ExecStart=/usr/bin/python3 /opt/comet-votes/server.py
+DynamicUser=yes
+StateDirectory=comet-votes
+Restart=on-failure
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

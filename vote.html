@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Comet logos: pick the ones you like</title>
+<title>Comet logos: vote for the ones you like</title>
 <meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=block" rel="stylesheet">
 <script src="logos.js"></script><script src="logos2.js"></script><script src="logos3.js"></script><script src="logos4.js"></script><script src="logos5.js"></script>
@@ -8,12 +8,18 @@
 body{background:#F6F5F2;color:#111;font:400 16px/1.5 Archivo,sans-serif;padding-bottom:110px}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
-header{padding:40px 0 18px}
+header{padding:36px 0 14px}
 h1{font:700 32px/1.1 Archivo;letter-spacing:-.02em}
 header p{color:#555;margin-top:8px;max-width:680px}
+.me{margin-top:10px;font-size:14px;color:#666}
+.me button{text-decoration:underline;color:#111}
 .banner{display:none;margin-top:16px;background:#111;color:#fff;border-radius:12px;padding:14px 16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .banner.on{display:flex}
 .banner button{background:#fff;color:#111;border-radius:999px;padding:8px 14px;font-weight:600;font-size:14px}
+.tabs{display:flex;gap:6px;margin-top:18px;border-bottom:1px solid #e4e2dc}
+.tab{padding:10px 14px;font-weight:600;font-size:16px;color:#777;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab.on{color:#111;border-color:#111}
+.tab small{font-weight:500;color:#888;font-size:13px}
 .bar{position:sticky;top:0;z-index:5;background:rgba(246,245,242,.95);backdrop-filter:blur(8px);border-bottom:1px solid #e4e2dc;padding:12px 0}
 .bar .wrap{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:none}
 .bar .k{font-size:13px;color:#777;margin:0 4px 0 6px;flex:none}
@@ -21,8 +27,9 @@ header p{color:#555;margin-top:8px;max-width:680px}
 .pill{flex:none;display:flex;align-items:center;gap:7px;border:1px solid #d8d6d0;background:#fff;border-radius:999px;padding:6px 12px;font-size:14px;white-space:nowrap}
 .pill i{width:16px;height:16px;border-radius:50%;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
 .pill.on{border-color:#111;box-shadow:inset 0 0 0 1px #111}
+.pill em{font-style:normal;color:#888;font-size:12px}
 .sep{flex:none;width:1px;height:24px;background:#d8d6d0;margin:0 6px}
-h2{font:700 20px Archivo;margin:34px 0 4px}
+h2{font:700 20px Archivo;margin:30px 0 4px}
 .sub{color:#666;font-size:15px;margin-bottom:14px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .card{background:#fff;border:2px solid transparent;border-radius:16px;overflow:hidden;box-shadow:0 1px 0 #e4e2dc;transition:border-color .15s,opacity .15s}
@@ -35,17 +42,32 @@ h2{font:700 20px Archivo;margin:34px 0 4px}
 .card .app{width:58px;height:58px;border-radius:14px;display:grid;place-items:center;box-shadow:0 5px 14px rgba(0,0,0,.18)}
 .card .cap{padding:12px 16px 4px}
 .card .cap b{font-weight:700}
-.card .cap p{color:#666;font-size:14px;line-height:1.4;margin-top:2px;min-height:39px}
+.card .cap p{color:#666;font-size:14px;line-height:1.4;margin-top:2px}
+.tally{font-size:13px;color:#555;padding:6px 16px 0;line-height:1.45}
+.tally .l{color:#1A7F46;font-weight:600}
+.tally .x{color:#777;font-weight:600}
 .vote{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px 16px}
 .vote button{border:1px solid #d8d6d0;border-radius:10px;padding:11px 8px;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:6px}
 .vote .like.on{background:#1A9E55;border-color:#1A9E55;color:#fff}
 .vote .nope.on{background:#111;border-color:#111;color:#fff}
+.card .pad{height:14px}
+.rank{background:#fff;border-radius:16px;box-shadow:0 1px 0 #e4e2dc;overflow:hidden;margin-top:18px}
+.rrow{display:grid;grid-template-columns:34px minmax(150px,1.1fr) 1.4fr;gap:14px;align-items:center;padding:14px 18px;border-top:1px solid #f0eee9}
+.rrow:first-child{border-top:0}
+.rrow .n{font:700 18px Archivo;color:#999;text-align:center}
+.rrow .lg{overflow:hidden}
+.rrow .lg b{display:block;font-size:14px;margin-top:6px}
+.meter{display:flex;height:10px;border-radius:5px;overflow:hidden;background:#eee;margin-bottom:6px}
+.meter .l{background:#1A9E55}.meter .x{background:#bbb}
+.who{font-size:13px;color:#555;line-height:1.45}
+.who .l{color:#1A7F46;font-weight:600}.who .x{color:#777;font-weight:600}
+.none{color:#777;padding:30px 0}
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid #e4e2dc;box-shadow:0 -6px 20px rgba(0,0,0,.06)}
-.dock .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;padding-bottom:14px}
-.dock .count{font-size:15px;color:#444}
+.dock .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;padding-bottom:12px}
+.dock .count{font-size:15px;color:#444;line-height:1.35}
 .dock .count b{color:#111}
+.dock .st{display:block;font-size:12px;color:#888}
 .dock .send{background:#111;color:#fff;border-radius:999px;padding:12px 20px;font-weight:700;font-size:15px;white-space:nowrap}
-.dock .send:disabled{opacity:.35;cursor:default}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;border-radius:10px;padding:10px 14px;font-size:14px;display:none;max-width:90vw;z-index:9}
 .toast.on{display:block}
 dialog{border:0;border-radius:16px;padding:22px;max-width:420px;width:calc(100% - 32px);margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -53,24 +75,26 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 dialog h3{font:700 20px Archivo;margin-bottom:6px}
 dialog p{color:#555;font-size:15px;margin-bottom:12px}
 dialog input{width:100%;font:inherit;border:1px solid #ccc;border-radius:10px;padding:11px 12px;margin-bottom:12px}
-dialog .link{font-size:13px;word-break:break-all;background:#F4F3EF;border-radius:8px;padding:10px;margin-bottom:12px;display:none}
 dialog .btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 dialog .btns button{border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid #d8d6d0}
 dialog .btns .pri{background:#111;color:#fff;border-color:#111}
 @media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){.bar .wrap{flex-wrap:wrap;row-gap:8px}.sep{display:none}.bar .k{min-width:46px}.wrap{padding:0 14px}h1{font-size:25px}.grid{grid-template-columns:1fr}.card .main{height:150px}}
+@media(max-width:640px){.wrap{padding:0 14px}h1{font-size:25px}.grid{grid-template-columns:1fr}.card .main{height:150px}
+ .bar{position:static}.bar .wrap{flex-wrap:wrap;row-gap:8px}.sep{display:none}.bar .k{min-width:46px}
+ .rrow{grid-template-columns:26px 1fr;padding:14px}.rrow .stat{grid-column:2}}
 </style></head><body>
 <header><div class="wrap"><h1>Comet logos: which do you like?</h1>
-<p>Tap <b>Like</b> or <b>Not for me</b> on each logo. When you're done, tap <b>Send my picks</b> to get a link that shows your choices to anyone you send it to.</p>
-<div class="banner" id="banner"><span id="bannerText"></span><button id="mine">Make my own picks</button></div></div></header>
+<p>Tap <b>Like</b> or <b>Not for me</b> on each logo. Your votes save as you go, and everyone's votes add up under <b>Results</b>.</p>
+<div class="me" id="me"></div>
+<div class="banner" id="banner"><span id="bannerText"></span><button id="mine">Vote myself</button></div>
+<div class="tabs"><button class="tab" data-tab="vote">Vote</button><button class="tab" data-tab="results">Results <small id="ppl"></small></button></div></div></header>
 <div class="bar"><div class="wrap" id="bar"></div></div>
 <main class="wrap" id="list"></main>
-<div class="dock"><div class="wrap"><div class="count" id="count"></div><button class="send" id="send">Send my picks</button></div></div>
+<div class="dock"><div class="wrap"><div class="count" id="count"></div><button class="send" id="send">Send this page</button></div></div>
 <div class="toast" id="toast"></div>
-<dialog id="dlg"><h3>Send your picks</h3><p>Add your name so people know whose picks these are.</p>
-<input id="who" placeholder="Your name" autocomplete="given-name">
-<div class="link" id="linkBox"></div>
-<div class="btns"><button id="cancel">Close</button><button class="pri" id="go">Copy link</button></div></dialog>
+<dialog id="dlg"><h3>What's your name?</h3><p>So everyone can see whose votes are whose.</p>
+<input id="who" placeholder="Your name" autocomplete="given-name" maxlength="40">
+<div class="btns"><button id="cancel">Cancel</button><button class="pri" id="go">Save</button></div></dialog>
 <script>
 const PAL=[
  {k:'cobalt',n:'Cobalt',ink:'#0F1222',accent:'#2F4BFF',night:'#0F1222',dark:'#6F86FF'},
@@ -104,16 +128,24 @@ const GROUPS=[
   ['pixel','Arcade','Pixel letters and an 8-bit comet.'],
   ['mono','Terminal','Monospace with a typing cursor.']]],
 ];
-const ALL=GROUPS.flatMap(g=>g[2]);
+const ALL=GROUPS.flatMap(g=>g[2]);const BYKEY=Object.fromEntries(ALL.map(x=>[x[0],x]));
+const HOME='https://app.whiteboardgeeks.com/comet-votes/';
+const API=(location.protocol.startsWith('http')&&!/htmlpreview|github|statically/.test(location.host))?'api/votes':HOME+'api/votes';
 const $=id=>document.getElementById(id);
-const store={get(){try{return JSON.parse(localStorage.getItem('cometVotes')||'{}')}catch(_){return{}}},set(v){try{localStorage.setItem('cometVotes',JSON.stringify(v))}catch(_){}}};
-// Shared view: #by=Name&v=key.y,key.n&c=cobalt
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(_){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}};
+let myId=ls.get('cometVoterId',null);
+if(!myId){const a=new Uint8Array(18);crypto.getRandomValues(a);myId=Array.from(a,b=>'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'[b&63]).join('');ls.set('cometVoterId',myId)}
+let myName=ls.get('cometName','');
+let mine=ls.get('cometVotes',{});
+let people=[];let online=null;let status='';
+// Old-style shared links: #by=Name&v=key.y,key.n&c=cobalt
 const hp=new URLSearchParams(location.hash.slice(1));
-let viewing=null;
-if(hp.get('v')){const v={};hp.get('v').split(',').forEach(x=>{const [k,d]=x.split('.');if(k&&(d==='y'||d==='n'))v[k]=d});viewing={by:hp.get('by')||'Someone',votes:v}}
-let votes=viewing?viewing.votes:store.get();
+let viewing=null;// {by, votes}
+if(hp.get('v')){const v={};hp.get('v').split(',').forEach(x=>{const [k,d]=x.split('.');if(BYKEY[k]&&(d==='y'||d==='n'))v[k]=d});viewing={by:hp.get('by')||'Someone',votes:v}}
+let tab=viewing?'results':(hp.get('tab')==='results'?'results':'vote');
 let cur=PAL.find(p=>p.k===hp.get('c'))||PAL[0];
-let filter=viewing?'y':'all';
+let filter='all';let person=null;// results: null = everyone, else pid
+let pending=null;// vote waiting for a name
 
 function logo(k,p,{size=40,dark=false}={}){return LOGOS[k].html({ink:dark?'#fff':p.ink,accent:dark?p.dark:p.accent,size})}
 function icon(k,p,s){const L=LOGOS[k];
@@ -122,54 +154,107 @@ function icon(k,p,s){const L=LOGOS[k];
  if(k==='ss_twotone')return L.icon(p.dark,s,'#fff');
  return L.icon(p.dark,s);}
 const SIZE={sf_didone:34,deco:36,seal:32,wide:38,label:38,film:36,neon:36,pixel:38,garamond:40,sf_italic:40,marker:38};
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+const myPid=()=>myId.slice(0,8);
+function others(){return people.filter(p=>p.pid!==myPid())}
+function everyone(){// server rows, with my live local votes in place of my server row
+ const me=myName&&Object.keys(mine).length?[{pid:myPid(),name:myName,votes:mine,me:true}]:[];
+ return others().concat(me)}
+function tallyOf(k){const ys=[],ns=[];everyone().forEach(p=>{if(p.votes[k]==='y')ys.push(p.name);else if(p.votes[k]==='n')ns.push(p.name)});return{ys,ns}}
+function names(a){return a.map(esc).join(', ')}
 
 function bar(){
- const filters=[['all','All'],['y','Liked'],['n','Not for me'],['u','Not rated yet']];
- $('bar').innerHTML='<span class="k">Show</span>'+filters.map(([k,n])=>`<button class="pill ${filter===k?'on':''}" data-f="${k}">${n}</button>`).join('')+
-  '<span class="sep"></span><span class="k">Colour</span>'+PAL.map(p=>`<button class="pill ${p===cur?'on':''}" data-c="${p.k}"><i style="background:${p.accent}"></i>${p.n}</button>`).join('');
+ let h='';
+ if(tab==='vote'){const f=[['all','All'],['y','Liked'],['n','Not for me'],['u','Not rated yet']];
+  h+='<span class="k">Show</span>'+f.map(([k,n])=>`<button class="pill ${filter===k?'on':''}" data-f="${k}">${n}</button>`).join('')+'<span class="sep"></span>';}
+ else{const ev=everyone();
+  h+='<span class="k">Whose</span><button class="pill '+(person?'':'on')+'" data-p="">Everyone <em>'+ev.length+'</em></button>'+
+   ev.map(p=>`<button class="pill ${person===p.pid?'on':''}" data-p="${esc(p.pid)}">${esc(p.name)}${p.me?' (you)':''}</button>`).join('')+'<span class="sep"></span>';}
+ h+='<span class="k">Colour</span>'+PAL.map(p=>`<button class="pill ${p===cur?'on':''}" data-c="${p.k}"><i style="background:${p.accent}"></i>${p.n}</button>`).join('');
+ $('bar').innerHTML=h;
 }
-function card([k,n,d]){
- const v=votes[k]||'';const s=SIZE[k]||42;
+function card([k,n,d],votes,{voting=true,tally=true}={}){
+ const v=votes[k]||'';const s=SIZE[k]||42;const t=tally?tallyOf(k):{ys:[],ns:[]};
  return `<div class="card ${v}" data-k="${k}"><div class="main">${logo(k,cur,{size:s})}</div>
  <div class="row"><div class="dark" style="background:${cur.night}">${logo(k,cur,{size:Math.round(s*.55),dark:true})}</div>
  <div class="ic"><div class="app" style="background:${cur.night}">${icon(k,cur,38)}</div></div></div>
  <div class="cap"><b>${n}</b><p>${d}</p></div>
- ${viewing?'':`<div class="vote"><button class="like ${v==='y'?'on':''}" data-v="y">♥ Like</button><button class="nope ${v==='n'?'on':''}" data-v="n">✕ Not for me</button></div>`}</div>`;
+ ${t.ys.length||t.ns.length?`<div class="tally">${t.ys.length?`<span class="l">♥ ${t.ys.length}</span> ${names(t.ys)}`:''}${t.ys.length&&t.ns.length?' &nbsp;·&nbsp; ':''}${t.ns.length?`<span class="x">✕ ${t.ns.length}</span> ${names(t.ns)}`:''}</div>`:''}
+ ${voting?`<div class="vote"><button class="like ${v==='y'?'on':''}" data-v="y">♥ Like</button><button class="nope ${v==='n'?'on':''}" data-v="n">✕ Not for me</button></div>`:'<div class="pad"></div>'}</div>`;
+}
+function voteView(){
+ const keep=([k])=>filter==='all'||(filter==='u'?!mine[k]:mine[k]===filter);let any=false;
+ const h=GROUPS.map(([t,sub,items])=>{const shown=items.filter(keep);if(!shown.length)return'';any=true;
+  return `<h2>${t}</h2><p class="sub">${sub}</p><div class="grid">${shown.map(x=>card(x,mine)).join('')}</div>`}).join('');
+ return any?h:'<p class="none">Nothing here yet.</p>';
+}
+function resultsView(){
+ if(viewing){const v=viewing.votes;const ys=ALL.filter(([k])=>v[k]==='y'),ns=ALL.filter(([k])=>v[k]==='n');
+  return (ys.length?`<h2>${esc(viewing.by)} liked</h2><div class="grid">${ys.map(x=>card(x,v,{voting:false,tally:false})).join('')}</div>`:'')+
+   (ns.length?`<h2>${esc(viewing.by)} said not for me</h2><div class="grid">${ns.map(x=>card(x,v,{voting:false,tally:false})).join('')}</div>`:'')||'<p class="none">No picks in this link.</p>'}
+ const ev=everyone();
+ if(person){const p=ev.find(x=>x.pid===person);if(!p){person=null;return resultsView()}
+  const ys=ALL.filter(([k])=>p.votes[k]==='y'),ns=ALL.filter(([k])=>p.votes[k]==='n');
+  return `<h2>${esc(p.name)} liked ${ys.length}</h2>`+(ys.length?`<div class="grid">${ys.map(x=>card(x,p.votes,{voting:false})).join('')}</div>`:'<p class="none">None yet.</p>')+
+   (ns.length?`<h2>Not for ${esc(p.name)}</h2><div class="grid">${ns.map(x=>card(x,p.votes,{voting:false})).join('')}</div>`:'')}
+ if(online===false&&!ev.length)return '<p class="none">Results could not load. Check your connection and refresh.</p>';
+ if(!ev.length)return '<p class="none">No votes yet. Be the first on the Vote tab.</p>';
+ const rows=ALL.map(x=>({x,...tallyOf(x[0])})).sort((a,b)=>(b.ys.length-b.ns.length)-(a.ys.length-a.ns.length)||b.ys.length-a.ys.length||a.ns.length-b.ns.length);
+ const total=ev.length;
+ return `<h2>Ranking</h2><p class="sub">${total} ${total===1?'person has':'people have'} voted. Most liked first; a “not for me” counts against a logo.</p><div class="rank">`+rows.map((r,i)=>{
+  const [k,n]=r.x;const lw=100*r.ys.length/total,xw=100*r.ns.length/total;
+  return `<div class="rrow"><div class="n">${i+1}</div><div class="lg">${logo(k,cur,{size:22})}<b>${n}</b></div>
+  <div class="stat"><div class="meter"><span class="l" style="width:${lw}%"></span><span class="x" style="width:${xw}%"></span></div>
+  <div class="who">${r.ys.length?`<span class="l">♥ ${r.ys.length}</span> ${names(r.ys)}`:'<span style="color:#aaa">No likes</span>'}${r.ns.length?` &nbsp;·&nbsp; <span class="x">✕ ${r.ns.length}</span> ${names(r.ns)}`:''}</div></div></div>`}).join('')+'</div>';
 }
 function draw(){
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+ const n=everyone().length;$('ppl').textContent=n?`· ${n} ${n===1?'person':'people'}`:'';
+ $('me').innerHTML=myName?`Voting as <b>${esc(myName)}</b> · <button id="rename">change name</button>`:'';
  bar();
- const keep=([k])=>filter==='all'||(filter==='u'?!votes[k]:votes[k]===filter);
- let any=false;
- $('list').innerHTML=GROUPS.map(([t,sub,items])=>{const shown=items.filter(keep);if(!shown.length)return'';any=true;
-  return `<h2>${t}</h2><p class="sub">${sub}</p><div class="grid">${shown.map(card).join('')}</div>`}).join('')+(any?'':`<p style="color:#777;padding:30px 0">Nothing here yet.</p>`);
- const y=ALL.filter(([k])=>votes[k]==='y').length,n=ALL.filter(([k])=>votes[k]==='n').length;
- $('count').innerHTML=viewing?`<b>${esc(viewing.by)}</b> liked <b>${y}</b>, passed on <b>${n}</b>`:`Liked <b>${y}</b> · Not for me <b>${n}</b> · ${ALL.length-y-n} to go`;
- $('send').textContent=viewing?'Make my own picks':'Send my picks';
- $('send').disabled=!viewing&&!(y+n);
- if(viewing){$('banner').classList.add('on');$('bannerText').textContent=`You're looking at ${viewing.by}'s picks, showing the ones they liked. Tap "All" or "Not for me" to see the rest.`}
- else $('banner').classList.remove('on');
+ const y=ALL.filter(([k])=>mine[k]==='y').length,no=ALL.filter(([k])=>mine[k]==='n').length;
+ $('list').innerHTML=tab==='vote'?voteView():resultsView();
+ $('count').innerHTML=`Liked <b>${y}</b> · Not for me <b>${no}</b> · ${ALL.length-y-no} to go<span class="st">${esc(status)}</span>`;
+ if(viewing){$('banner').classList.add('on');$('bannerText').textContent=`These are ${viewing.by}'s picks from a link they sent.`}else $('banner').classList.remove('on');
 }
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2600)}
-function startOwn(){viewing=null;votes=store.get();filter='all';try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}draw();scrollTo(0,0)}
-function shareLink(){
- const name=$('who').value.trim()||'Someone';try{localStorage.setItem('cometName',name)}catch(_){}
- const v=ALL.filter(([k])=>votes[k]).map(([k])=>k+'.'+votes[k]).join(',');
- const h=new URLSearchParams({by:name,v,c:cur.k}).toString();
- return location.href.split('#')[0]+'#'+h;
+
+async function load(){
+ try{const r=await fetch(API,{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();people=d.people||[];online=true;
+  const meRow=people.find(p=>p.pid===myPid());
+  if(meRow&&!Object.keys(mine).length&&Object.keys(meRow.votes).length){mine=meRow.votes;ls.set('cometVotes',mine)}
+  if(meRow&&!myName){myName=meRow.name;ls.set('cometName',myName)}
+ }catch(_){online=false}
+ draw();
 }
+let saveT=null;
+function save(){clearTimeout(saveT);status='Saving…';saveT=setTimeout(async()=>{
+ try{const r=await fetch(API+'/'+myId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:myName,votes:mine})});if(!r.ok)throw 0;status='Saved ✓ Everyone can see your votes on Results';online=true}
+ catch(_){status='Could not save. Your votes are kept on this device; trying again shortly.';setTimeout(save,8000)}
+ refreshDock()},450);refreshDock()}
+function refreshDock(){const st=document.querySelector('.dock .st');if(st)st.textContent=status}
+function askName(){$('who').value=myName;$('dlg').showModal();setTimeout(()=>$('who').focus(),50)}
+function applyVote(k,v){if(mine[k]===v)delete mine[k];else mine[k]=v;ls.set('cometVotes',mine);draw();save()}
+
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.tab){tab=b.dataset.tab;person=null;if(tab==='vote')viewing=null;draw();if(tab==='results')load();return}
  if(b.dataset.f){filter=b.dataset.f;draw();return}
+ if(b.dataset.p!==undefined){person=b.dataset.p||null;draw();return}
  if(b.dataset.c){cur=PAL.find(p=>p.k===b.dataset.c);draw();return}
- if(b.dataset.v){const k=b.closest('.card').dataset.k;if(votes[k]===b.dataset.v)delete votes[k];else votes[k]=b.dataset.v;store.set(votes);draw();return}
- if(b.id==='mine'){startOwn();return}
- if(b.id==='send'){if(viewing){startOwn();return}try{$('who').value=localStorage.getItem('cometName')||''}catch(_){}$('linkBox').style.display='none';$('go').textContent='Copy link';$('dlg').showModal();return}
- if(b.id==='cancel'){$('dlg').close();return}
- if(b.id==='go'){const url=shareLink();$('linkBox').textContent=url;$('linkBox').style.display='block';
-  if(navigator.share&&matchMedia('(pointer:coarse)').matches){try{await navigator.share({title:'My Comet logo picks',url});return}catch(_){}}
-  try{await navigator.clipboard.writeText(url);$('go').textContent='Copied ✓';toast('Link copied. Paste it into a text or email.')}catch(_){
-   const r=document.createRange();r.selectNodeContents($('linkBox'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('go').textContent='Copy the link above'}}
+ if(b.dataset.v){const k=b.closest('.card').dataset.k;if(!myName){pending=[k,b.dataset.v];askName();return}applyVote(k,b.dataset.v);return}
+ if(b.id==='rename'){pending=null;askName();return}
+ if(b.id==='mine'){viewing=null;tab='vote';try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}draw();scrollTo(0,0);return}
+ if(b.id==='cancel'){pending=null;$('dlg').close();return}
+ if(b.id==='go'){const n=$('who').value.trim().replace(/\s+/g,' ');if(!n){$('who').focus();return}
+  myName=n.slice(0,40);ls.set('cometName',myName);$('dlg').close();
+  if(pending){const [k,v]=pending;pending=null;applyVote(k,v)}else{draw();if(Object.keys(mine).length)save()}return}
+ if(b.id==='send'){const url=HOME;
+  if(navigator.share&&matchMedia('(pointer:coarse)').matches){try{await navigator.share({title:'Vote on the Comet logos',url});return}catch(_){}}
+  try{await navigator.clipboard.writeText(url);toast('Link copied: '+url)}catch(_){prompt('Copy this link:',url)}}
 });
-addEventListener('DOMContentLoaded',draw);
+$('who').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('go').click()}});
+setInterval(()=>{if(document.visibilityState==='visible'&&tab==='results'&&!viewing)load()},15000);
+addEventListener('focus',()=>{if(tab==='results')load()});
+addEventListener('DOMContentLoaded',()=>{draw();load()});
 </script></body></html>

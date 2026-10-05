@@ -1,0 +1,9 @@
+# Comet logo vote page — public on purpose (sent to people outside WBG). Votes live in
+# /var/lib/comet-votes/votes.db (systemd DynamicUser). Source: github.com/lancejohnson/comet-logos/server
+redir /comet-votes /comet-votes/ permanent
+handle_path /comet-votes/* {
+    request_body {
+        max_size 16KB
+    }
+    reverse_proxy 127.0.0.1:8120
+}
