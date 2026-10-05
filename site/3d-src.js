@@ -311,17 +311,53 @@ function viewLineup() {
 
 // ---------- Two brochures: the first version, one open flat and one standing ----------
 function viewTwo() {
-  const f = add(makeBrochure()); f.root.position.set(0, 0, 4); scene.add(f.root);
-  f.target = Math.PI; f.playAt = performance.now() + 1500;
-  const st = add(makeBrochure());
-  st.root.rotation.set(Math.PI / 2, 0, 0); st.root.position.set(-W / 2, D / 2, -TB);
-  const wrap = new THREE.Group(); wrap.add(st.root); wrap.position.set(-7, 0, -13); wrap.rotation.y = .32; scene.add(wrap); st.holder = wrap;
-  st.target = st.angle = .45; st.shadow.visible = false;
+  // two poses: lying open in front, standing slightly open behind. Tapping the one at the back swaps them:
+  // both close, the back one lifts over and lies down in front while the other stands up behind, then the new front one opens flat.
+  const mk = (pos, rx, wrapPos, wrapRy) => {
+    const inner = new THREE.Matrix4().compose(new THREE.Vector3(...pos), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, 0, 0)), new THREE.Vector3(1, 1, 1));
+    const outer = new THREE.Matrix4().compose(new THREE.Vector3(...wrapPos), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, wrapRy, 0)), new THREE.Vector3(1, 1, 1));
+    const m = outer.multiply(inner), P = new THREE.Vector3(), Q = new THREE.Quaternion(); m.decompose(P, Q, new THREE.Vector3()); return {P, Q};
+  };
+  const LIE = mk([0, 0, 4], 0, [0, 0, 0], 0);
+  const STAND = mk([-W / 2, D / 2, -TB], Math.PI / 2, [-7, 0, -13], .32);
+  const OPEN_FRONT = Math.PI, OPEN_BACK = .45;
+  const pair = [add(makeBrochure()), add(makeBrochure())];
+  pair.forEach(b => { const h = new THREE.Group(); h.add(b.root); scene.add(h); b.holder = h; });
+  const place = (b, pose) => { b.holder.position.copy(pose.P); b.holder.quaternion.copy(pose.Q); };
+  let front = pair[0], back = pair[1];
+  place(front, LIE); place(back, STAND);
+  front.target = OPEN_FRONT; front.playAt = performance.now() + 1500;
+  back.target = back.angle = OPEN_BACK; back.shadow.visible = false;
+  // the design bar sets the front one; the back one shows the next design in the list
+  brandTargets = k => { front.brandKey = k; const i = BRANDS.findIndex(b => b[0] === k), n = BRANDS[(i + 1) % BRANDS.length][0]; back.brandKey = n; loadBrand(n).then(t => back.setBrand(t)); return [front]; };
+  let swap = null;           // {t0}
+  const startSwap = () => {
+    if (swap) return;
+    swap = {t0: performance.now(), a0: [front.angle, back.angle]};
+    pair.forEach(b => { b.manual = true; b.screenOn = false; b.shadow.visible = false; });
+  };
   setCam(isPhone ? [6, 60, 92] : [14, 17, 40].map(v => v * 1.55), [0, 3, -3]);
-  // the standing one only rocks between closed and slightly open, so it never reaches the one lying in front
-  onTap = b => { if (b === f) tapOpenClose(Math.PI)(b); else b.target = b.target > .2 ? 0 : .45; };
+  onTap = b => { if (swap) return; if (b === front) tapOpenClose(OPEN_FRONT)(b); else startSwap(); };
   controls.autoRotate = true; spin.classList.add('on');
-  toggleBtn.onclick = () => { f.target = 0; f.playAt = Infinity; setTimeout(() => { f.target = Math.PI; f.playAt = performance.now() + 1200; }, 1400); };
+  hint.textContent = 'Drag to turn. Tap the front one to open or close it, the back one to bring it forward.';
+  toggleBtn.onclick = () => { front.target = 0; front.playAt = Infinity; setTimeout(() => { front.target = OPEN_FRONT; front.playAt = performance.now() + 1200; }, 1400); };
+  const P = new THREE.Vector3();
+  tick = now => {
+    if (!swap) return;
+    const t = (now - swap.t0) / 1000;
+    const c = 1 - ease(t / .7); front.angle = swap.a0[0] * c; back.angle = swap.a0[1] * c;   // both close first
+    const k = ease((t - .6) / 1.5);
+    // the one coming forward arcs up and over; the one going back slides low
+    place(back, {P: P.lerpVectors(STAND.P, LIE.P, k).clone().add(new THREE.Vector3(0, Math.sin(Math.PI * k) * 11, 0)), Q: STAND.Q.clone().slerp(LIE.Q, k)});
+    place(front, {P: P.lerpVectors(LIE.P, STAND.P, k).clone().add(new THREE.Vector3(-Math.sin(Math.PI * k) * 14, 0, 0)), Q: LIE.Q.clone().slerp(STAND.Q, k)});
+    if (t > 2.2) {
+      [front, back] = [back, front]; pair.forEach(b => { b.manual = false; b.target = b.angle = 0; });
+      showBrand(front.brandKey);
+      front.target = OPEN_FRONT; front.playAt = now + 1100; front.shadow.visible = true;
+      back.target = OPEN_BACK;
+      swap = null;
+    }
+  };
 }
 
 ({intro: viewIntro, slider: viewSlider, scroll: viewScroll, display: viewDisplay, lineup: viewLineup, two: viewTwo})[VIEW]();
@@ -336,15 +372,16 @@ const writeHash = () => { try { history.replaceState(null, '', `#view=${VIEW}&br
 vbar.onclick = e => { const b = e.target.closest('button'); if (!b) return; location.hash = `view=${b.dataset.v}&brand=${brand}`; location.reload(); };
 async function setBrand(k) {
   brand = k; const t = await loadBrand(k);
-  brandTargets().forEach(b => b.setBrand(t));
-  bar.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.b === k)); writeHash();
+  brandTargets(k).forEach(b => b.setBrand(t));
+  showBrand(k);
 }
+function showBrand(k) { brand = k; bar.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.b === k)); writeHash(); }
 bar.onclick = e => { const b = e.target.closest('button'); if (b) setBrand(b.dataset.b); };
 
 const clock = new THREE.Clock();
 renderer.setAnimationLoop(t => {
   const dt = Math.min(clock.getDelta(), .05);
-  const driving = tick(t);
+  const driving = tick(t);  // views that steer the camera return true
   if (!driving && controls.enabled) controls.update();
   brochures.forEach(b => b.update(t, dt));
   renderer.render(scene, camera);
