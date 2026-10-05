@@ -1,0 +1,206 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comet homepage options</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=Manrope:wght@800&display=block" rel="stylesheet">
+<script src="../logos.js"></script><script src="../logos2.js"></script><script src="../logos3.js"></script>
+<style>
+:root{--bg:#fff;--ink:#111;--mute:#777;--line:#E4E4E4;--soft:#F4F4F4;--accent:#2F4BFF;--onaccent:#fff;--tint:#EEF1FF;--buy:var(--accent)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);transition:background .3s;font:400 17px/1.5 Archivo,sans-serif;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;font-size:15px;color:var(--mute)}
+main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column}
+.intro{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px);align-items:center;text-align:center;padding:10px 0 24px}
+.intro img{width:100%;max-width:640px}
+.intro p{font-size:26px;font-weight:700;margin-top:0;letter-spacing:-.01em}
+.intro .sub{font-size:17px;font-weight:400;color:var(--mute);margin-top:4px}
+.reel{position:relative;width:100%;max-width:680px;aspect-ratio:16/9}
+.reel img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transform:translateX(24px);transition:opacity .7s ease,transform .7s ease}
+.reel img.on{opacity:1;transform:none}
+.reel img.out{opacity:0;transform:translateX(-24px)}
+.dots{display:flex;gap:6px;margin:6px 0 18px}
+.dots button{width:6px;height:6px;border-radius:50%;background:#D6D6D6;padding:0}
+.dots button.on{background:var(--accent);width:18px;border-radius:3px}
+.ctas{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:22px}
+.cta{border:1.5px solid var(--ink);transition:transform .15s;border-radius:999px;padding:15px 20px;font-size:17px;font-weight:700}
+.cta.primary{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}.cta:hover{transform:translateY(-1px)}
+body:not(.has-chat) .composer{display:none}
+.starters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.starters button{border:1px solid var(--line);border-radius:14px;padding:12px 16px;text-align:left;font-size:16px;font-weight:500;line-height:1.3}
+.starters button small{display:block;font-weight:400;font-size:14px;color:var(--mute)}
+.starters button:hover{border-color:var(--ink)}
+.has-chat .starters{display:none}
+.drop{border:1.5px dashed #bbb;border-radius:14px;padding:22px;text-align:center;color:var(--mute);font-size:15px}
+.follow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.follow button{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;color:#444}
+.tip{font-size:15px;color:#444;background:var(--soft);border-radius:12px;padding:10px 14px}
+.big3d{width:100%;max-height:300px;object-fit:contain;background:var(--soft);border-radius:14px;padding:16px}
+
+.thread{display:none;flex-direction:column;gap:22px;padding:20px 0 30px}
+.has-chat .intro{display:none}.has-chat .thread{display:flex}
+.me{align-self:flex-end;background:var(--soft);padding:10px 16px;border-radius:18px;max-width:80%}
+.bot{align-self:flex-start;max-width:100%;width:100%}
+.bot p+p,.bot p+div,.bot div+p{margin-top:12px}
+.designs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.designs button{border:1px solid var(--line);border-radius:12px;padding:10px;text-align:left;font-size:14px;color:var(--mute)}
+.designs button img{width:100%;height:120px;object-fit:contain;display:block;margin-bottom:6px}
+.designs button.on{border-color:var(--accent);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:15px}
+.chips button.on{background:var(--accent);color:var(--onaccent);border-color:var(--accent)}
+.chips small{display:block;font-size:12px;color:var(--mute)}
+.chips button.on small{color:inherit;opacity:.7}
+.price{display:flex;align-items:baseline;gap:12px}
+.price b{font-size:34px;letter-spacing:-.02em}
+.price span{color:var(--mute)}
+.order{display:inline-block;background:var(--buy);color:var(--onaccent);font-weight:700;padding:12px 20px;border-radius:999px}
+.composer{position:sticky;bottom:0;background:var(--bg);padding:10px 0 22px}
+.box{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:26px;padding:6px 6px 6px 18px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.box input{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font:400 17px Archivo;min-width:0}
+.box .clip{color:var(--mute);padding:8px 10px;font-size:15px}
+.box .send{width:40px;height:40px;border-radius:50%;background:var(--accent);color:var(--onaccent);display:grid;place-items:center;font-size:18px}
+.fine{text-align:center;font-size:12px;color:var(--mute);margin-top:10px}
+@media(max-width:600px){.intro p{font-size:22px!important}.ctas{max-width:none}.intro{min-height:calc(100vh - 70px)}.starters{grid-template-columns:1fr 1fr;gap:6px}.starters button{padding:10px 12px;font-size:15px}.starters button small{font-size:12.5px}.intro p{font-size:20px}.intro .sub{font-size:15px}.intro img{max-width:330px}nav{padding:16px 18px}.intro p{font-size:19px}.designs{grid-template-columns:1fr 1fr 1fr;gap:6px}.designs button img{height:70px}.designs button{padding:6px;font-size:12px}}
+
+/* ---------- review toolbar ---------- */
+.review{position:sticky;top:0;z-index:20;background:#111;color:#fff;font-size:13px;display:flex;gap:18px;align-items:center;padding:8px 16px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.review .g{display:flex;gap:4px;align-items:center}
+.review .g>span{color:#888;margin-right:4px}
+.review button{color:#ccc;border:1px solid #333;border-radius:999px;padding:4px 10px;font-size:13px}
+.review button.on{background:#fff;color:#111;border-color:#fff}
+.review i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+/* ---------- styles ---------- */
+.copy{display:flex;flex-direction:column;align-items:center;width:100%}
+/* Split */
+.s-split main{max-width:1180px}
+.s-split .intro{display:grid;grid-template-columns:1.35fr 1fr;grid-template-rows:auto auto;column-gap:48px;text-align:left;align-content:center}
+.s-split .reel{grid-row:1;grid-column:1;max-width:none}
+.s-split .dots{grid-row:2;grid-column:1;justify-self:center}
+.s-split .copy{grid-row:1/3;grid-column:2;align-items:flex-start}
+.s-split .intro p{font-size:46px;line-height:1.05;letter-spacing:-.025em}
+.s-split .ctas{max-width:300px}
+/* Dark */
+.s-dark{--bg:#0B0B10;--ink:#F5F5F7;--mute:#9A9AA6;--line:#2A2A33;--soft:#1A1A22}
+.s-dark .reel img{filter:drop-shadow(0 30px 50px rgba(0,0,0,.6))}
+.s-dark .intro{background:radial-gradient(ellipse 55% 45% at 50% 38%,rgba(255,255,255,.07),transparent 70%)}
+.s-dark .dots button{background:#3A3A44}
+/* Panel */
+.s-panel main{max-width:1000px}
+.s-panel .reel{max-width:none;aspect-ratio:2.2/1;background:var(--tint);border-radius:28px;padding:28px 40px}
+.s-panel .reel img{inset:28px 40px;width:calc(100% - 80px);height:calc(100% - 56px)}
+.s-panel .dots{margin-top:14px}
+.s-panel .intro p{font-size:30px;letter-spacing:-.02em}.s-panel .ctas{margin-top:16px}
+/* Big type */
+.s-big .intro{justify-content:flex-start;padding-top:36px}
+.s-big .copy{order:-1}
+.s-big .intro p{font-size:58px;line-height:1;letter-spacing:-.035em;max-width:760px;margin-bottom:6px}
+.s-big .ctas{order:0;margin:20px 0 10px}
+.s-big .reel{order:1;max-width:760px}
+.s-big .dots{order:2}
+.s-big main{max-width:900px}
+@media(max-width:700px){
+ .s-split .intro{grid-template-columns:1fr;text-align:center}.s-split .reel,.s-split .dots,.s-split .copy{grid-column:1;grid-row:auto;justify-self:stretch}.s-split .dots{justify-self:center}.s-split .copy{align-items:center}.s-split .intro p{font-size:30px!important}.s-split .ctas{max-width:none}
+ .s-panel .reel{padding:14px;border-radius:20px;aspect-ratio:4/3}.s-panel .reel img{inset:14px;width:calc(100% - 28px);height:calc(100% - 28px)}.s-panel .intro p{font-size:24px!important}
+ .s-big .intro p{font-size:40px!important}
+}
+</style></head><body>
+<div class="review" id="review"></div>
+<nav><span id="navlogo"></span><a>(804) 506-3291</a></nav>
+<main>
+ <div class="intro">
+  <div class="reel" id="reel">
+   <img class="on" src="img/p14.webp" alt="Video brochure design">
+   <img src="img/p12.webp" alt=""><img src="img/p10.webp" alt=""><img src="img/p8.webp" alt=""><img src="img/p7.webp" alt="">
+   <img src="img/p3.webp" alt=""><img src="img/p15.webp" alt=""><img src="img/p13.webp" alt=""><img src="img/p4.webp" alt=""><img src="img/p6.webp" alt="">
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="copy">
+  <p>Video brochures, designed and priced online.</p>
+  <div class="ctas">
+   <button class="cta primary" data-s="price"><span>Get Pricing</span></button>
+   <button class="cta" data-s="design"><span>Design Your Own</span></button>
+  </div>
+  </div>
+ </div>
+ <div class="thread" id="thread"></div>
+ <div class="composer">
+  <form class="box" id="form"><input id="msg" placeholder="Paste your website or ask anything" aria-label="Message"><button type="button" class="clip">Attach</button><button class="send" aria-label="Send">↑</button></form>
+  <div class="fine">Free to design. Orders from 25 units.</div>
+ </div>
+</main>
+<script>
+// Scripted mockup of the AI designer. Sample prices only.
+const QTY=[25,50,100,250,500,1000];
+const SIZE={'5-inch':[48,38,31,25,21,17],'7-inch':[64,50,38,29,23,18],'10-inch':[108,90,76,64,58,54]};
+const st={size:'7-inch',qi:3,design:0};
+const $=id=>document.getElementById(id);
+const m=n=>'$'+n.toLocaleString('en-US');
+const add=(cls,html)=>{const d=document.createElement('div');d.className=cls;d.innerHTML=html;$('thread').appendChild(d);d.scrollIntoView({block:'end'});return d};
+function priceBlock(){
+ const p=SIZE[st.size],u=p[st.qi],q=QTY[st.qi];
+ return `<div class="chips" data-g="size">${Object.keys(SIZE).map(k=>`<button class="${k===st.size?'on':''}" data-v="${k}">${k}</button>`).join('')}</div>
+ <p></p><div class="chips" data-g="qty">${QTY.map((n,i)=>`<button class="${i===st.qi?'on':''}" data-v="${i}">${n.toLocaleString()}<small>${m(p[i])} each</small></button>`).join('')}</div>
+ <p></p><div class="price"><b>${m(u*q)}</b><span>${q.toLocaleString()} brochures, ${m(u)} each</span></div>
+ <p></p><a class="order">Order these</a>`;
+}
+let priceEl,custom=null;
+const chat=()=>document.body.classList.add('has-chat');
+const DES=['p8','p10','p13'];
+function designs(name){
+ return add('bot',`<p>Here are three designs for ${name}. Pick one, or tell me what to change.</p>
+  <div class="designs">${DES.map((s,i)=>`<button class="${i===st.design?'on':''}" data-d="${i}"><img src="img/${s}.png" alt="">Design ${i+1}</button>`).join('')}</div>
+  <div class="follow"><button data-f="See design 1 in 3D">See it in 3D</button><button data-f="Make it darker">Make it darker</button><button data-f="Use a photo on the cover">Photo cover</button><button data-f="Change the headline">Change the headline</button></div>`);
+}
+function prices(lead){priceEl=add('bot',`<p>${lead}</p>${priceBlock()}`);priceEl.dataset.lead=lead}
+function reply(text,kind){
+ chat();add('me',text.replace(/</g,'&lt;'));
+ setTimeout(()=>{
+  if(kind==='design'){add('bot','<p>What is your website? Paste it below and I’ll pull your logo, colours and fonts.</p>');$('msg').focus();return}
+  if(kind==='upload'){add('bot','<p>Drop your files here. A logo is enough to start. Add your video now or later.</p><div class="drop">Drop logo and video, or <u>browse</u></div>');return}
+  if(kind==='200'){designs('your trade show');st.qi=3;
+   prices(`I priced 250 instead of 200, because 250 costs less in total.`);
+   add('bot',`<div class="tip">200 brochures at ${m(SIZE[st.size][2])} each is ${m(SIZE[st.size][2]*200)}. 250 is the next price break, at ${m(SIZE[st.size][3])} each, so 250 costs ${m(SIZE[st.size][3]*250)} in total. That is less than 200.</div>`);return}
+  if(kind==='follow'){add('bot',`<p>Done. Here is design ${st.design+1} in 3D. Drag to turn it.</p><img class="big3d" src="img/${DES[st.design]}.png" alt="">`);return}
+  const site=(text.match(/[\w-]+\.(com|io|co|net|org|ai|us)\b/)||[])[0];
+  if(kind==='price'||(/cost|price|how much/i.test(text)&&!site)){prices('Pick a size and quantity. The price per brochure drops at each step.');return}
+  designs(site||'your brand');prices('How many do you need?');
+ },250);
+}
+document.addEventListener('click',e=>{
+ const s=e.target.closest('.cta');if(s){reply(s.querySelector('span').textContent,s.dataset.s);return}
+ const f=e.target.closest('.follow button');if(f){reply(f.dataset.f,'follow');return}
+ const d=e.target.closest('.designs button');if(d){st.design=+d.dataset.d;d.parentElement.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===d));return}
+ const c=e.target.closest('.chips button');if(c&&priceEl){const g=c.parentElement.dataset.g;if(g==='size')st.size=c.dataset.v;else st.qi=+c.dataset.v;priceEl.innerHTML=`<p>${priceEl.dataset.lead}</p>${priceBlock()}`}
+});
+$('form').onsubmit=e=>{e.preventDefault();const v=$('msg').value.trim();if(v){reply(v);$('msg').value=''}};
+// Design reel: cycles through example designs every 2.6 s; dots jump to one.
+const imgs=[...document.querySelectorAll('#reel img')];let ri=0,timer;
+$('dots').innerHTML=imgs.map((_,i)=>`<button aria-label="Design ${i+1}" data-i="${i}" class="${i?'':'on'}"></button>`).join('');
+function show(n){imgs[ri].classList.remove('on');imgs[ri].classList.add('out');const old=imgs[ri];setTimeout(()=>old.classList.remove('out'),700);ri=(n+imgs.length)%imgs.length;imgs[ri].classList.add('on');[...$('dots').children].forEach((d,i)=>d.classList.toggle('on',i===ri))}
+const go=()=>{clearInterval(timer);timer=setInterval(()=>show(ri+1),2600)};go();
+$('dots').onclick=e=>{const d=e.target.closest('button');if(d){show(+d.dataset.i);go()}};
+
+// ---------- review toolbar: style / colour / logo, kept in the address as ?style=&colour=&logo= ----------
+const STYLES=[['clean','Clean'],['split','Split'],['dark','Dark'],['panel','Panel'],['big','Big type']];
+const COLOURS={cobalt:{n:'Cobalt',accent:'#2F4BFF',on:'#fff',tint:'#EEF1FF',dark:'#6F86FF',ink:'#0F1222'},
+ amber:{n:'Amber',accent:'#E89A00',on:'#111',tint:'#FFF4DA',dark:'#FFB423',ink:'#17140E'},
+ black:{n:'Black',accent:'#111111',on:'#fff',tint:'#F2F2F2',dark:'#FFFFFF',ink:'#111111'}};
+const LOGOSET=[['ss_clean','Shooting Star'],['ss_twotone','Two-Tone Tail'],['ss_speed','Speed Lines'],['trail','Dot Trail'],['playc','Play C'],['tile','Tile']];
+const qs=new URLSearchParams(location.search.includes('style=')?location.search:location.hash.slice(1));
+const R={style:qs.get('style')||'clean',colour:qs.get('colour')||'cobalt',logo:qs.get('logo')||'ss_clean'};
+function applyReview(){
+ const c=COLOURS[R.colour],dark=R.style==='dark',a=dark?c.dark:c.accent;
+ document.body.className=document.body.className.replace(/\bs-\w+/g,'').trim()+' s-'+R.style;
+ const st=document.documentElement.style;st.setProperty('--accent',a);st.setProperty('--onaccent',dark&&R.colour==='black'?'#111':c.on);st.setProperty('--tint',c.tint);
+ if(!dark)st.setProperty('--ink',R.colour==='black'?'#111':c.ink);else st.removeProperty('--ink');
+ $('navlogo').innerHTML=LOGOS[R.logo].html({ink:dark?'#fff':c.ink,accent:a,size:22});
+ const grp=(k,label,items)=>`<div class="g"><span>${label}</span>${items.map(([v,n,dot])=>`<button data-r="${k}" data-v="${v}" class="${R[k]===v?'on':''}">${dot?`<i style="background:${dot}"></i>`:''}${n}</button>`).join('')}</div>`;
+ $('review').innerHTML='<b style="color:#fff">Comet homepage options</b>'+grp('style','Style',STYLES)+grp('colour','Colour',Object.entries(COLOURS).map(([k,v])=>[k,v.n,v.accent]))+grp('logo','Logo',LOGOSET)+'<a href="../index.html" style="color:#aaa;text-decoration:underline">Logo sheet</a>';
+ try{history.replaceState(null,'',location.pathname+location.search.replace(/[?&]?(style|colour|logo)=[^&]*/g,'').replace(/^&/,'?')+'#style='+R.style+'&colour='+R.colour+'&logo='+R.logo)}catch(_){}
+}
+$('review').onclick=e=>{const b=e.target.closest('button');if(b){R[b.dataset.r]=b.dataset.v;applyReview()}};
+applyReview();
+addEventListener('DOMContentLoaded',()=>{if(location.hash==='#demo')reply('acme.com');if(location.hash==='#demo200')reply('I need 200 for a trade show','200')});
+</script>
+</body></html>
