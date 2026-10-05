@@ -197,11 +197,14 @@ function reply(text,kind){
  },250);
 }
 document.addEventListener('click',e=>{
- const s=e.target.closest('.cta');if(s){reply(s.querySelector('span').textContent,s.dataset.s);return}
+ const s=e.target.closest('.cta');if(s&&s.dataset.s==='price'){location.href=pageURL('pricing.html');return}
+ if(s){reply(s.querySelector('span').textContent,s.dataset.s);return}
  const f=e.target.closest('.follow button');if(f){reply(f.dataset.f,'follow');return}
  const d=e.target.closest('.designs button');if(d){st.design=+d.dataset.d;d.parentElement.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===d));return}
  const c=e.target.closest('.chips button');if(c&&priceEl){const g=c.parentElement.dataset.g;if(g==='size')st.size=c.dataset.v;else st.qi=+c.dataset.v;priceEl.innerHTML=`<p>${priceEl.dataset.lead}</p>${priceBlock()}`}
 });
+// Link to a sibling page; also works through htmlpreview.github.io, which keeps the real address after the '?'.
+const pageURL=f=>location.host==='htmlpreview.github.io'?location.pathname+location.search.replace(/[^/]*\.html.*$/,f):f;
 $('form').onsubmit=e=>{e.preventDefault();const v=$('msg').value.trim();if(v){reply(v);$('msg').value=''}};
 // Design reel: cycles through example designs every 2.6 s; dots jump to one.
 const imgs=[...document.querySelectorAll('#reel img')];let ri=0,timer;
