@@ -214,7 +214,7 @@ function play(){timers.forEach(clearTimeout);const svg=document.querySelector('#
  timers=[setTimeout(()=>setOpen(true),700),setTimeout(()=>setOpen(false),3600)]}
 function tapBook(){timers.forEach(clearTimeout);setOpen(!st.opened)}
 try{document.getElementById('navlogo').innerHTML=LOGOS.ss_clean.html({ink:'#0F1222',accent:'#2F4BFF',size:22})}catch(_){}
-const pageURL=f=>location.host==='htmlpreview.github.io'?location.pathname+location.search.replace(/[^/]*\.html.*$/,f):f;
+const pageURL=f=>location.host==='htmlpreview.github.io'?location.origin+location.pathname+location.search.replace(/[^/]*\.html.*$/,f):f;
 document.getElementById('home').onclick=e=>{e.preventDefault();location.href=pageURL('index.html')};
 render();
 </script></body></html>
