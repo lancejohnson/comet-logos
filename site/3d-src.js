@@ -33,7 +33,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.enablePan = false;
 controls.minDistance = 40; controls.maxDistance = 140;
 controls.minPolarAngle = 0.15; controls.maxPolarAngle = 1.35;
-controls.autoRotate = true; controls.autoRotateSpeed = 0.5;
+controls.autoRotate = false; controls.autoRotateSpeed = 0.5;
 
 const key = new THREE.DirectionalLight(0xffffff, 1.5); key.position.set(-18, 50, 30); key.castShadow = true;
 key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 16; key.shadow.blurSamples = 25; key.shadow.bias = -0.0005;
@@ -131,9 +131,9 @@ function makeBrochure() {
 
   const b = {root, m, edgeB, edgeC, scr, screenMesh, pivot, spine, shadow, angle: 0, target: 0, img: null,
     setBrand(t) { for (const k of ['front', 'inl', 'inr', 'back']) { m[k].map = t[k]; m[k].needsUpdate = true; } edgeB.color.copy(t.edgeBase); edgeC.color.copy(t.edgeCover); b.img = t.front.image; scr.t0 = performance.now(); },
-    playAt: Infinity,
+    playAt: Infinity, manual: false, screenOn: false, wasOn: false,
     update(t, dt) {
-      if (intro === null) b.angle += (b.target - b.angle) * Math.min(1, dt * 3);
+      if (!b.manual) b.angle += (b.target - b.angle) * Math.min(1, dt * 3);
       const a = b.angle, o = a / Math.PI;
       pivot.rotation.z = a;
       // spine: upright strip when closed, flat strip when open
@@ -141,86 +141,210 @@ function makeBrochure() {
       spine.scale.set(sw, sh, 1); spine.position.set(-sw / 2, sh / 2, 0);
       const left = -Math.max(0, Math.cos(Math.min(a, Math.PI)) < 0 ? -Math.cos(a) * W : 0) - Math.sin(Math.min(a, Math.PI / 2)) * 1.5;
       shadow.scale.set((W - left) * 1.15, D * 1.3, 1); shadow.position.x = (W + left) / 2;
-      drawScreen(scr, b.img, t, t >= b.playAt && b.target > 0);
+      const on = b.manual ? b.screenOn : (t >= b.playAt && b.target > 0);
+      if (on && !b.wasOn) scr.t0 = t; b.wasOn = on;
+      drawScreen(scr, b.img, t, on);
     },
   };
   return b;
 }
 
-// ---------- scene: one brochure, with an intro: lying closed, opening, then playing ----------
-const OPEN = 1.80;                         // cover stands just past upright
-const front = makeBrochure();
-front.root.position.set(-W / 2 + 3, 0, 0);
-scene.add(front.root);
-front.playAt = Infinity;
-
+// =====================================================================
+// Views. Each one sets up its own scene; switching view reloads the page.
+// =====================================================================
+const VIEWS = [['intro', 'Intro'], ['slider', 'Slider'], ['scroll', 'Scroll story'], ['display', 'Desk display'], ['lineup', 'Lineup'], ['two', 'Two brochures']];
+const params = new URLSearchParams(location.hash.slice(1));
+const VIEW = VIEWS.some(v => v[0] === params.get('view')) ? params.get('view') : 'intro';
+document.body.classList.add('v-' + VIEW);
+const OPEN = 1.80;
 const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
-const cam = {
-  a: {pos: new THREE.Vector3(2, 58, 34), tgt: new THREE.Vector3(0, 0, 0)},
-  b: {pos: new THREE.Vector3(10, 29, 56), tgt: new THREE.Vector3(-1, 7.5, -1)},
-};
-let intro = null;          // start time of the intro, ms
-function startIntro() {
-  intro = performance.now(); front.angle = front.target = 0; front.playAt = Infinity;
-  controls.enabled = false; controls.autoRotate = false; spin.classList.remove('on');
-}
-function runIntro(now) {
-  const t = (now - intro) / 1000;
-  const k = ease((t - 0.6) / 2.2);                       // camera glide
-  camera.position.lerpVectors(cam.a.pos, cam.b.pos, k);
-  controls.target.lerpVectors(cam.a.tgt, cam.b.tgt, k);
-  front.angle = front.target = OPEN * ease((t - 0.9) / 1.6);   // cover opens
-  if (t > 2.6 && front.playAt === Infinity) { front.playAt = now; front.scr.t0 = now; }
-  if (t > 3.0) { intro = null; controls.enabled = true; }
-  camera.lookAt(controls.target);
-}
+const seg = (p, a, b) => ease((p - a) / (b - a));
+const phone = () => stage.clientWidth < 600;
+const isPhone = phone();
+const brochures = [];
+const add = b => { brochures.push(b); return b; };
+
+const toggleBtn = document.getElementById('toggle'), spin = document.getElementById('spin');
+spin.onclick = () => { controls.autoRotate = !controls.autoRotate; spin.classList.toggle('on', controls.autoRotate); };
+const hint = document.getElementById('hint');
+controls.addEventListener('start', () => { hint.style.opacity = 0; });
+const capEl = document.getElementById('cap');
 
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false);
   camera.aspect = w / h; camera.fov = w < 600 ? 38 : 26; camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(stage); resize();
-if (stage.clientWidth < 600) { cam.a.pos.set(0, 74, 46); cam.b.pos.set(9, 32, 68); cam.b.tgt.set(-1, 6, -1); }
-camera.position.copy(cam.a.pos); controls.target.copy(cam.a.tgt);
-controls.autoRotate = false;
+function setCam(pos, tgt) { camera.position.set(...pos); controls.target.set(...tgt); camera.lookAt(controls.target); }
 
-// ---------- interaction ----------
-const toggleBtn = document.getElementById('toggle');
-toggleBtn.textContent = 'Replay';
-const spin = document.getElementById('spin'); spin.classList.remove('on');
-spin.onclick = () => { controls.autoRotate = !controls.autoRotate; spin.classList.toggle('on', controls.autoRotate); };
-toggleBtn.onclick = () => startIntro();
-const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let pdown = null;
+// tap on a brochure to open or close it (used by several views)
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let pdown = null, onTap = null;
 renderer.domElement.addEventListener('pointerdown', e => { pdown = [e.clientX, e.clientY]; });
 renderer.domElement.addEventListener('pointerup', e => {
-  if (intro !== null || !pdown || Math.hypot(e.clientX - pdown[0], e.clientY - pdown[1]) > 5) return;
+  if (!onTap || !pdown || Math.hypot(e.clientX - pdown[0], e.clientY - pdown[1]) > 5) return;
   const r = renderer.domElement.getBoundingClientRect(); ptr.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(ptr, camera);
-  if (ray.intersectObject(front.root, true).length) {
-    if (front.target > 0) { front.target = 0; front.playAt = Infinity; } else { front.target = OPEN; front.playAt = performance.now() + 1200; front.scr.t0 = front.playAt; }
-  }
+  const hit = brochures.find(b => ray.intersectObject(b.holder || b.root, true).length); if (hit) onTap(hit);
 });
-controls.addEventListener('start', () => { document.getElementById('hint').style.opacity = 0; });
+const tapOpenClose = (openTo = OPEN) => b => { if (b.target > 0) { b.target = 0; b.playAt = Infinity; } else { b.target = openTo; b.playAt = performance.now() + 1100; } };
 
-const bar = document.getElementById('brands');
-bar.innerHTML = '<span>Design</span>' + BRANDS.map(([k, n], i) => `<button data-b="${k}" class="${i ? '' : 'on'}">${n}</button>`).join('');
-async function setBrand(k) {
-  const t = await loadBrand(k); front.setBrand(t);
-  bar.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.b === k));
-  try { history.replaceState(null, '', '#brand=' + k); } catch (e) {}
+// a holder lets a brochure flip and spin about its own centre
+function withHolder(b) {
+  const h = new THREE.Group(); h.add(b.root); b.root.position.set(-W / 2, 0, 0); b.holder = h; scene.add(h); return b;
 }
-bar.onclick = e => { const b = e.target.closest('button'); if (b) setBrand(b.dataset.b).then(startIntro); };
+
+let tick = () => {};          // per-frame hook for the active view
+let brandTargets = () => brochures;
+
+// ---------- Intro: lies closed, opens, screen powers on ----------
+function viewIntro() {
+  const b = add(makeBrochure()); b.root.position.set(-W / 2 + 3, 0, 0); scene.add(b.root);
+  const A = isPhone ? [[0, 74, 46], [0, 0, 0]] : [[2, 58, 34], [0, 0, 0]];
+  const B = isPhone ? [[9, 32, 68], [-1, 6, -1]] : [[10, 29, 56], [-1, 7.5, -1]];
+  let t0 = null;
+  const start = () => { t0 = performance.now(); b.manual = true; b.screenOn = false; b.angle = 0; controls.enabled = false; };
+  toggleBtn.onclick = start; onTap = b2 => { b.manual = false; tapOpenClose()(b2); };
+  tick = now => {
+    if (t0 === null) return;
+    const t = (now - t0) / 1000, k = ease((t - .6) / 2.2);
+    camera.position.lerpVectors(new THREE.Vector3(...A[0]), new THREE.Vector3(...B[0]), k);
+    controls.target.lerpVectors(new THREE.Vector3(...A[1]), new THREE.Vector3(...B[1]), k); camera.lookAt(controls.target);
+    b.angle = OPEN * ease((t - .9) / 1.6); b.screenOn = t > 2.6;
+    if (t > 3.1) { t0 = null; controls.enabled = true; b.manual = false; b.target = OPEN; b.playAt = 0; }
+    return true;
+  };
+  setCam(...A); start();
+}
+
+// ---------- Slider / Scroll story: one timeline, flat > open > closed > back > all the way round ----------
+const STEPS = [[0, 'Closed'], [.12, 'Opens'], [.3, 'Plays'], [.46, 'Closes'], [.6, 'Back'], [.76, 'All round']];
+const CAPTIONS = [[0, 'Your design on the cover.'], [.12, 'Open it.'], [.28, 'The video starts by itself.'], [.46, 'Closes flat, fits a mailer.'], [.6, 'Printed on the back too.'], [.76, 'Every side is yours.']];
+function timelineBrochure() {
+  const b = withHolder(add(makeBrochure())); b.manual = true;
+  return p => {
+    // open to flat (π) and back
+    const open = seg(p, .12, .28) * (1 - seg(p, .46, .58));
+    b.angle = Math.PI * open; b.screenOn = p > .25 && p < .5;
+    // flip over to show the back, spin all the way round, flip back
+    const flip = seg(p, .6, .72) * (1 - seg(p, .93, 1));
+    const spinK = seg(p, .76, .92);
+    const h = b.holder;
+    h.rotation.set(0, 0, 0);
+    h.rotation.z = Math.PI * flip;
+    h.position.set(0, Math.sin(Math.PI * flip) * 7 + (TB + TC) * flip, 0);
+    h.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.PI * 2 * spinK);
+    // keep the open spread centred
+    b.root.position.x = -W / 2 + (W / 2 + SPINE / 2) * open;
+  };
+}
+function viewSlider() {
+  const pose = timelineBrochure();
+  setCam(isPhone ? [0, 40, 54] : [0, 40, 56], [0, 1, 0]);
+  const scrub = document.getElementById('scrub'), range = document.getElementById('range'), play = document.getElementById('play'), steps = document.getElementById('steps');
+  scrub.hidden = false; steps.innerHTML = STEPS.map(s => `<span>${s[1]}</span>`).join('');
+  hint.textContent = 'Drag the slider, or drag the brochure to turn it.';
+  let playing = true, p = 0, last = performance.now();
+  play.onclick = () => { playing = !playing; play.textContent = playing ? 'Pause' : 'Play'; };
+  range.oninput = () => { playing = false; play.textContent = 'Play'; p = range.value / 1000; };
+  toggleBtn.onclick = () => { p = 0; playing = true; play.textContent = 'Pause'; };
+  tick = now => {
+    const dt = (now - last) / 1000; last = now;
+    if (playing) { p = (p + dt / 16) % 1; range.value = p * 1000; }
+    pose(p);
+    steps.querySelectorAll('span').forEach((el, i) => el.classList.toggle('on', p >= STEPS[i][0] && (i === STEPS.length - 1 || p < STEPS[i + 1][0])));
+  };
+}
+function viewScroll() {
+  const pose = timelineBrochure();
+  controls.enabled = false;
+  setCam(isPhone ? [0, 56, 76] : [0, 40, 56], [0, 1, 0]);
+  hint.textContent = 'Scroll'; hint.style.bottom = '8px';
+  const track = document.getElementById('track');
+  let shown = -1;
+  tick = () => {
+    const r = track.getBoundingClientRect(), span = r.height - innerHeight;
+    const p = Math.min(1, Math.max(0, -r.top / span)) * .999;
+    pose(p);
+    let i = 0; CAPTIONS.forEach((c, j) => { if (p >= c[0]) i = j; });
+    if (i !== shown) { shown = i; capEl.style.opacity = 0; setTimeout(() => { capEl.textContent = CAPTIONS[i][1]; capEl.style.opacity = 1; }, 180); }
+    hint.style.opacity = p > .02 ? 0 : 1;
+  };
+}
+
+// ---------- Desk display: stood up like a card on a desk, on a slow turntable ----------
+function viewDisplay() {
+  const b = add(makeBrochure());
+  // stand it on its long bottom edge; the hinge is vertical
+  b.root.rotation.set(Math.PI / 2, 0, 0); b.root.position.set(0, D / 2, 0);
+  const g = new THREE.Group(); g.add(b.root); scene.add(g); b.holder = g;
+  b.shadow.visible = false;
+  b.target = b.angle = 2.2; b.playAt = 0;   // opened like a greeting card, screen facing out
+  // turn so the screen panel faces the camera
+  g.rotation.y = -0.55; g.position.set(-3, 0, 2);
+  const disc = new THREE.Mesh(new THREE.CylinderGeometry(19, 19, .4, 96), new THREE.MeshPhysicalMaterial({color: 0xf4f4f5, roughness: .5, clearcoat: .3}));
+  disc.position.y = -.2; disc.receiveShadow = true; scene.add(disc);
+  scene.add(g); g.position.y = 0;
+  setCam(isPhone ? [0, 30, 96] : [0, 20, 70], [0, 6, 0]);
+  onTap = tapOpenClose(2.2);
+  controls.autoRotate = true; controls.autoRotateSpeed = 1.2; spin.classList.add('on');
+  toggleBtn.onclick = () => { b.target = 0; b.playAt = Infinity; setTimeout(() => { b.target = 2.2; b.playAt = performance.now() + 900; }, 1300); };
+}
+
+// ---------- Lineup: three designs side by side, all playing ----------
+function viewLineup() {
+  const keys = ['Netflix', 'MicrosoftAzureAI', 'Ozempic'];
+  const xs = isPhone ? [[0, 0, -34], [0, 0, 0], [0, 0, 34]] : [[-40, 0, -4], [0, 0, 0], [40, 0, -4]];
+  keys.forEach((k, i) => {
+    const b = add(makeBrochure()); b.root.position.set(xs[i][0] - W / 2 + 3, 0, xs[i][2]); b.root.rotation.y = isPhone ? 0 : (1 - i) * 0.18; scene.add(b.root);
+    b.target = OPEN; b.playAt = performance.now() + 1200 + i * 350; b.brandKey = k;
+    loadBrand(k).then(t => b.setBrand(t));
+  });
+  brochures.forEach((b, i) => { b.angle = 0; });
+  brandTargets = () => [];
+  document.getElementById('brands').style.display = 'none';
+  setCam(isPhone ? [8, 120, 104] : [0, 46, 96], [0, 3, 0]);
+  onTap = tapOpenClose();
+  toggleBtn.onclick = () => brochures.forEach((b, i) => { b.target = 0; b.playAt = Infinity; setTimeout(() => { b.target = OPEN; b.playAt = performance.now() + 1100; }, 1200 + i * 250); });
+}
+
+// ---------- Two brochures: the first version, one open flat and one standing ----------
+function viewTwo() {
+  const f = add(makeBrochure()); f.root.position.set(SPINE / 2, 0, 3); scene.add(f.root);
+  f.target = Math.PI; f.playAt = performance.now() + 1500;
+  const st = add(makeBrochure());
+  st.root.rotation.set(Math.PI / 2, 0, 0); st.root.position.set(-W / 2, D / 2, -TB);
+  const wrap = new THREE.Group(); wrap.add(st.root); wrap.position.set(-7, 0, -13); wrap.rotation.y = .32; scene.add(wrap); st.holder = wrap;
+  st.target = st.angle = .45; st.shadow.visible = false;
+  setCam(isPhone ? [6, 60, 92] : [14, 17, 40].map(v => v * 1.55), [0, 3, -3]);
+  onTap = b => { if (b === f) tapOpenClose(Math.PI)(b); else b.target = b.target > 1 ? .45 : 1.4; };
+  controls.autoRotate = true; spin.classList.add('on');
+  toggleBtn.onclick = () => { f.target = 0; f.playAt = Infinity; setTimeout(() => { f.target = Math.PI; f.playAt = performance.now() + 1200; }, 1400); };
+}
+
+({intro: viewIntro, slider: viewSlider, scroll: viewScroll, display: viewDisplay, lineup: viewLineup, two: viewTwo})[VIEW]();
+
+// ---------- toolbar ----------
+const vbar = document.getElementById('views');
+vbar.innerHTML = '<span>View</span>' + VIEWS.map(([k, n]) => `<button data-v="${k}" class="${k === VIEW ? 'on' : ''}">${n}</button>`).join('');
+const bar = document.getElementById('brands');
+bar.innerHTML = '<span>Design</span>' + BRANDS.map(([k, n]) => `<button data-b="${k}">${n}</button>`).join('');
+let brand = BRANDS.some(b => b[0] === params.get('brand')) ? params.get('brand') : 'Netflix';
+const writeHash = () => { try { history.replaceState(null, '', `#view=${VIEW}&brand=${brand}`); } catch (e) {} };
+vbar.onclick = e => { const b = e.target.closest('button'); if (!b) return; location.hash = `view=${b.dataset.v}&brand=${brand}`; location.reload(); };
+async function setBrand(k) {
+  brand = k; const t = await loadBrand(k);
+  brandTargets().forEach(b => b.setBrand(t));
+  bar.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.b === k)); writeHash();
+}
+bar.onclick = e => { const b = e.target.closest('button'); if (b) setBrand(b.dataset.b); };
 
 const clock = new THREE.Clock();
 renderer.setAnimationLoop(t => {
   const dt = Math.min(clock.getDelta(), .05);
-  if (window.__at != null) { if (intro === null) startIntro(); intro = t - window.__at * 1000; }
-  if (intro !== null) runIntro(t); else controls.update();
-  front.update(t, dt); renderer.render(scene, camera);
+  const driving = tick(t);
+  if (!driving && controls.enabled) controls.update();
+  brochures.forEach(b => b.update(t, dt));
+  renderer.render(scene, camera);
 });
-
-const start = (new URLSearchParams(location.hash.slice(1)).get('brand')) || 'Netflix';
-setBrand(BRANDS.some(b => b[0] === start) ? start : 'Netflix').then(() => {
-  document.getElementById('loading').remove();
-  startIntro();
-  window.__ready = true;
+(VIEW === 'lineup' ? Promise.all(['Netflix', 'MicrosoftAzureAI', 'Ozempic'].map(loadBrand)) : setBrand(brand)).then(() => {
+  document.getElementById('loading').remove(); window.__ready = true;
 });
