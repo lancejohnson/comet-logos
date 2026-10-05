@@ -1,0 +1,95 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comet logo options</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&display=block" rel="stylesheet">
+<script src="logos.js"></script><script src="logos2.js"></script><script src="logos3.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;color:#111;font:400 16px/1.5 Archivo,sans-serif}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+header{padding:44px 0 20px}
+h1{font:700 34px/1.1 Archivo;letter-spacing:-.02em}
+header p{color:#666;margin-top:8px;max-width:640px}
+.bar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid #eee;padding:14px 0}
+.bar .wrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bar .k{font-size:14px;color:#666;margin-right:6px}
+.sw{display:flex;align-items:center;gap:8px;border:1px solid #ddd;border-radius:999px;padding:6px 12px 6px 6px;font-size:14px}
+.sw i{width:20px;height:20px;border-radius:50%;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.sw i.two{background:conic-gradient(var(--a) 0 50%,var(--b) 0 100%)}
+.sw.on{border-color:#111;box-shadow:inset 0 0 0 1px #111}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;padding:28px 0 20px}
+.card{border:1px solid #e6e6e6;border-radius:14px;overflow:hidden}
+.card .main{height:190px;display:grid;place-items:center;background:var(--paper,#fff)}
+.card .row{display:grid;grid-template-columns:1.5fr 1fr 1fr;height:120px}
+.card .dark{display:grid;place-items:center;background:var(--night,#111)}
+.card .ic{display:grid;place-items:center;background:#F2F2F2}
+.card .app{width:72px;height:72px;border-radius:17px;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.card .fav{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#fff;border-left:1px solid #eee}
+.card .fav span.b{width:28px;height:28px;border:1px solid #e3e3e3;border-radius:6px;display:grid;place-items:center}
+.card .cap{padding:14px 18px;border-top:1px solid #eee;display:flex;justify-content:space-between;gap:16px;align-items:baseline}
+.card .cap b{font-weight:700}
+.card .cap span{color:#666;font-size:14px;text-align:right}
+.matrix{padding:30px 0 70px}
+.matrix h2{font:700 22px Archivo;margin-bottom:6px}
+.matrix p{color:#666;font-size:15px;margin-bottom:16px}
+.scroll{overflow-x:auto;border:1px solid #e6e6e6;border-radius:14px}
+table{border-collapse:collapse;min-width:100%}
+th{font:500 13px Archivo;color:#666;text-align:left;padding:12px 16px;border-bottom:1px solid #eee;white-space:nowrap;position:sticky;top:0;background:#fff}
+td{padding:22px 16px;border-bottom:1px solid #f0f0f0;white-space:nowrap}
+td:first-child{font-weight:700;font-size:14px;padding-right:24px}
+tr td.pick{background:#FAFAFA}
+footer{border-top:1px solid #eee;padding:24px 0 40px;color:#888;font-size:14px}
+@media(max-width:760px){.wrap{padding:0 16px}h1{font-size:26px}.cards{grid-template-columns:1fr}.card .main{height:150px}.card .row{height:104px}.card .app{width:58px;height:58px;border-radius:14px}}
+</style></head><body>
+<header><div class="wrap"><h1>Comet logo options</h1><p>Six logos in ten colour schemes. Tap a colour to see every logo in it. The full grid at the bottom shows all of them side by side.</p></div></header>
+<div class="bar"><div class="wrap" id="sw"><span class="k">Colour</span></div></div>
+<main class="wrap"><div class="cards" id="cards"></div>
+<section class="matrix"><h2>Every logo in every colour</h2><p>Scroll sideways on a phone. The selected colour is shaded.</p><div class="scroll"><table id="mx"></table></div></section></main>
+<footer><div class="wrap">Comet · concept work, not final · info@cometvid.com</div></footer>
+<script>
+// ink = text colour on light backgrounds, accent = logo colour, night = dark background, dark = logo colour on dark background
+const PAL=[
+ {k:'cobalt',n:'Cobalt',ink:'#0F1222',accent:'#2F4BFF',night:'#0F1222',dark:'#6F86FF'},
+ {k:'violet',n:'Violet',ink:'#15111F',accent:'#6A3CF5',night:'#15111F',dark:'#9B7BFF'},
+ {k:'orange',n:'Signal orange',ink:'#141414',accent:'#FF5B14',night:'#141414',dark:'#FF6F2E'},
+ {k:'amber',n:'Amber',ink:'#17140E',accent:'#E89A00',night:'#17140E',dark:'#FFB423'},
+ {k:'teal',n:'Teal',ink:'#0D1A1A',accent:'#0A8F7F',night:'#0D1A1A',dark:'#2FD0B8'},
+ {k:'navysky',n:'Navy and sky',ink:'#0B1F3A',accent:'#3D8BFF',night:'#0B1F3A',dark:'#6BAAFF'},
+ {k:'forest',n:'Forest and lime',ink:'#10261C',accent:'#4CAF1F',night:'#10261C',dark:'#B6F03C'},
+ {k:'magenta',n:'Magenta',ink:'#18111A',accent:'#D61F8C',night:'#18111A',dark:'#FF52B5'},
+ {k:'mono',n:'Black only',ink:'#111111',accent:'#111111',night:'#111111',dark:'#FFFFFF'},
+ {k:'red',n:'Current red',ink:'#111111',accent:'#E8304A',night:'#111111',dark:'#FF4A62'},
+];
+const PICKS=[
+ ['ss_clean','Shooting Star','Solid tail and round head'],
+ ['ss_twotone','Two-Tone Tail','Tail in the text colour, head in colour'],
+ ['ss_speed','Speed Lines','Head with three trailing lines'],
+ ['trail','Dot Trail','A comet made of four shrinking dots'],
+ ['playc','Play C','Heavy C with a play button inside'],
+ ['tile','Tile','Square icon with a c and a dot'],
+];
+let cur=PAL.find(p=>p.k===location.hash.slice(1))||PAL[0];
+const $=id=>document.getElementById(id);
+function logo(k,p,{size=40,dark=false}={}){return LOGOS[k].html({ink:dark?'#fff':p.ink,accent:dark?p.dark:p.accent,size})}
+function icon(k,p,s,onColour){const L=LOGOS[k];
+ if(k==='tile')return onColour?L.icon('#fff',s):L.tileSvg(p.dark,s,p.night,'#fff');
+ if(k==='playc')return onColour?L.icon('#fff',s,'#fff'):L.mark('#fff',s,p.dark);
+ if(k==='ss_twotone')return onColour?L.icon('#fff',s,'#fff'):L.icon(p.dark,s,'#fff');
+ return L.icon(onColour?'#fff':p.dark,s);}
+function favicon(k,p){const L=LOGOS[k];
+ if(k==='playc')return L.mark(p.ink,20,p.accent); if(k==='ss_twotone')return L.icon(p.accent,20,p.ink); if(k==='tile')return L.tileSvg(p.accent,22,p.ink,'#fff'); return L.icon(p.accent,20);}
+function draw(){
+ $('sw').innerHTML='<span class="k">Colour</span>'+PAL.map(p=>`<button class="sw ${p===cur?'on':''}" data-k="${p.k}"><i class="two" style="--a:${p.ink};--b:${p.accent}"></i>${p.n}</button>`).join('');
+ $('cards').innerHTML=PICKS.map(([k,n,d])=>{
+  const mono=cur.k==='mono';
+  return `<div class="card"><div class="main">${logo(k,cur,{size:46})}</div>
+  <div class="row"><div class="dark" style="background:${cur.night}">${logo(k,cur,{size:26,dark:true})}</div>
+  <div class="ic"><div class="app" style="background:${cur.night}">${icon(k,cur,44,false)}</div></div>
+  <div class="fav"><span class="b">${favicon(k,cur)}</span><div class="app" style="width:34px;height:34px;border-radius:8px;box-shadow:none;background:${mono?'#111':cur.accent}">${icon(k,cur,22,true)}</div></div></div>
+  <div class="cap"><b>${n}</b><span>${d}</span></div></div>`}).join('');
+ $('mx').innerHTML=`<tr><th></th>${PAL.map(p=>`<th>${p.n}</th>`).join('')}</tr>`+PICKS.map(([k,n])=>`<tr><td>${n}</td>${PAL.map(p=>`<td class="${p===cur?'pick':''}">${logo(k,p,{size:22})}</td>`).join('')}</tr>`).join('');
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.sw');if(b){cur=PAL.find(p=>p.k===b.dataset.k);history.replaceState(null,'','#'+cur.k);draw()}});
+addEventListener('DOMContentLoaded',draw);
+</script></body></html>
