@@ -311,34 +311,21 @@ function viewLineup() {
 
 // ---------- Two brochures: the first version, one open flat and one standing ----------
 function viewTwo() {
-  // the same design twice: one lying open in front, one standing behind it.
-  // Tapping the standing one steps it back and opens it like a card on a desk, screen towards you.
-  const f = add(makeBrochure()); f.root.position.set(0, 0, 4); scene.add(f.root);
-  f.target = Math.PI; f.playAt = performance.now() + 1500;
-  const st = add(makeBrochure()); st.shadow.visible = false; st.manual = true;
-  st.root.rotation.set(Math.PI / 2, 0, 0);
-  const wrap = new THREE.Group(); wrap.add(st.root); scene.add(wrap); st.holder = wrap;
-  const SHUT = {root: new THREE.Vector3(-W / 2, D / 2, -TB), at: new THREE.Vector3(-7, 0, -13), ry: .32, angle: .45};
-  const OPENED = {root: new THREE.Vector3(0, D / 2, 0), at: new THREE.Vector3(-1, 0, -19), ry: -.55, angle: 2.2};
-  let k = 0, goal = 0;
-  const pose = () => {
-    const e = ease(k);
-    st.root.position.lerpVectors(SHUT.root, OPENED.root, e);
-    wrap.position.lerpVectors(SHUT.at, OPENED.at, e);
-    wrap.rotation.y = THREE.MathUtils.lerp(SHUT.ry, OPENED.ry, e);
-    st.angle = THREE.MathUtils.lerp(SHUT.angle, OPENED.angle, ease((k - .25) / .75));
-    st.screenOn = k > .9;
-  };
-  pose();
-  setCam(isPhone ? [6, 60, 92] : [14, 17, 40].map(v => v * 1.55), [0, 3, -5]);
-  onTap = b => { if (b === f) tapOpenClose(Math.PI)(b); else goal = goal ? 0 : 1; };
-  controls.autoRotate = true; spin.classList.add('on');
-  hint.textContent = 'Drag to turn. Tap either brochure to open it.';
-  toggleBtn.onclick = () => { goal = 0; f.target = 0; f.playAt = Infinity; setTimeout(() => { f.target = Math.PI; f.playAt = performance.now() + 1200; goal = 1; }, 1400); };
-  let last = performance.now();
-  tick = now => { const dt = (now - last) / 1000; last = now; if (k !== goal) { k = goal > k ? Math.min(1, k + dt / 1.4) : Math.max(0, k - dt / 1.4); pose(); } };
-  window.__openBack = () => { goal = 1; };
-  setTimeout(() => { goal = 1; }, 2600);   // opens by itself shortly after the front one
+  // the same design twice: one standing open at the back like a desk card, screen playing;
+  // one lying closed in front, cover up. Tap the closed one to open it flat.
+  const f = add(makeBrochure());
+  const fw = new THREE.Group(); fw.add(f.root); f.root.position.set(-W / 2, 0, -D / 2 + D / 2); fw.position.set(3, 0, 11); fw.rotation.y = .12; scene.add(fw); f.holder = fw;
+  f.target = f.angle = 0;
+  const st = add(makeBrochure()); st.shadow.visible = false;
+  st.root.rotation.set(Math.PI / 2, 0, 0); st.root.position.set(0, D / 2, 0);
+  const wrap = new THREE.Group(); wrap.add(st.root); wrap.position.set(-2, 0, -13); wrap.rotation.y = -.55; scene.add(wrap); st.holder = wrap;
+  st.target = st.angle = 2.2; st.playAt = performance.now() + 900;
+  setCam(isPhone ? [6, 40, 104] : [8, 22, 70], [0, 5, 0]);
+  onTap = b => { if (b === f) tapOpenClose(Math.PI)(b); else tapOpenClose(2.2)(b); };
+  controls.autoRotate = false;
+  hint.textContent = 'Drag to turn. Tap the closed one to open it.';
+  toggleBtn.onclick = () => { f.target = 0; f.playAt = Infinity; st.target = 0; st.playAt = Infinity; setTimeout(() => { st.target = 2.2; st.playAt = performance.now() + 900; }, 1300); };
+  window.__openFront = () => onTap(f);
 }
 
 ({intro: viewIntro, slider: viewSlider, scroll: viewScroll, display: viewDisplay, lineup: viewLineup, two: viewTwo})[VIEW]();
