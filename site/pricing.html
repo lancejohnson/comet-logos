@@ -162,13 +162,7 @@ function rowOpen(y,p,s,x=0){return [brochureOpen(x,y,p,s)+L(x+p.w,y+p.h+LS+2,`${
 function rowRuler(y,w){const n=Math.max(4,Math.floor(w/IN));return [ruler(0,y,n),n*IN,16]}
 
 const VIEWS=[
- {name:'Closed, then open',about:'<b>Closed, then open.</b> The closed brochure next to an iPhone 16, and the same brochure opened underneath. Same scale.',
-  draw(p,s){const a=rowClosed(0,p),b=rowOpen(a[2]+8,p,s),y3=a[2]+8+b[2]+4,W=Math.max(a[1],b[1]),c=rowRuler(y3,W);
-   return fit(W,y3+c[2],a[0]+b[0]+c[0])}},
- {name:'Open, then closed',about:'<b>Open, then closed.</b> The opened brochure on top, closed with an iPhone 16 below. Same scale.',
-  draw(p,s){const b=rowOpen(0,p,s),a=rowClosed(b[2]+8,p),y3=b[2]+8+a[2]+4,W=Math.max(a[1],b[1]),c=rowRuler(y3,W);
-   return fit(W,y3+c[2],b[0]+a[0]+c[0])}},
- {name:'Tap to open',about:'<b>Tap to open.</b> Closed next to an iPhone 16. Tap the brochure and it opens.',
+ {name:'Opens by itself',anim:true,about:'<b>Opens by itself.</b> Closed next to an iPhone 16, then it opens to show the screen and closes again. Tap it to open or close.',
   draw(p,s){const H=Math.max(PH.h,p.h),bx=PH.w+G,by=H-p.h,id='f'+(++uid);
    // right page (screen) sits under the cover; the cover folds to the spine, the inside page unfolds from it
    const right=brochureOpen(bx-p.w,by,p,s,{shadow:false,noLeft:true});
@@ -176,14 +170,20 @@ const VIEWS=[
    .bk .front{transform-box:fill-box;transform-origin:left center;transition:transform .25s ease-in .25s}.bk.open .front{transform:scaleX(0);transition-delay:0s}
    .bk .inl{transform-box:fill-box;transform-origin:right center;transform:scaleX(0);transition:transform .25s ease-out}.bk.open .inl{transform:scaleX(1);transition-delay:.25s}</style>
    ${phone(0,H-PH.h)}${L(PH.w/2,H+LS+2,PH.name,{a:'middle'})}
-   <g class="bk${st.opened?' open':''}" id="${id}" onclick="st.opened=!st.opened;this.classList.toggle('open');document.getElementById('tapt').textContent=st.opened?'Tap to close':'Tap to open'">
+   <g class="bk${st.opened?' open':''}" id="${id}" onclick="tapBook()">
     <g class="slide">${shadow(bx,by,p.w,p.h)}${right}
      <g class="inl"><image href="${IMG.inl}" x="${bx-p.w}" y="${by}" width="${p.w}" height="${p.h}" preserveAspectRatio="xMidYMid slice"/></g>
      <g class="front"><g transform="translate(${p.w} 0)">${cover(bx-p.w,by,p)}</g></g>
     </g></g>
    <text id="tapt" x="${bx+p.w/2}" y="${H+LS+2}" font-family="Archivo" font-size="${LS}" font-weight="700" fill="#2F4BFF" text-anchor="middle">${st.opened?'Tap to close':'Tap to open'}</text>`;
-   const W=bx+2*p.w,c=rowRuler(H+LS+8,W);
+   const W=bx+2*p.w,c=rowRuler(H+LS+8,W);ANIM={wc:bx+p.w,wo:W,h:H+LS+8+c[2]};
    return fit(W,H+LS+8+c[2],body+c[0])}},
+ {name:'Closed, then open',about:'<b>Closed, then open.</b> The closed brochure next to an iPhone 16, and the same brochure opened underneath. Same scale.',
+  draw(p,s){const a=rowClosed(0,p),b=rowOpen(a[2]+8,p,s),y3=a[2]+8+b[2]+4,W=Math.max(a[1],b[1]),c=rowRuler(y3,W);
+   return fit(W,y3+c[2],a[0]+b[0]+c[0])}},
+ {name:'Open, then closed',about:'<b>Open, then closed.</b> The opened brochure on top, closed with an iPhone 16 below. Same scale.',
+  draw(p,s){const b=rowOpen(0,p,s),a=rowClosed(b[2]+8,p),y3=b[2]+8+a[2]+4,W=Math.max(a[1],b[1]),c=rowRuler(y3,W);
+   return fit(W,y3+c[2],b[0]+a[0]+c[0])}},
  {name:'Closed + screen',about:'<b>Closed, plus the screen.</b> The closed brochure next to an iPhone 16, and below it the brochure’s screen next to the iPhone’s screen.',
   draw(p,s){const a=rowClosed(0,p),y=a[2]+10,Hs=Math.max(PH.sh,s.h);
    const r2=screenAlone(2,y+Hs-PH.sh,PH.sw,PH.sh,8,2.6)+L(2+PH.sw/2,y+Hs+LS+3,'iPhone 16 screen',{a:'middle'})
@@ -198,7 +198,10 @@ function render(){
  document.getElementById('tabs').innerHTML=VIEWS.map((x,i)=>`<button class="${i===st.view?'on':''}" data-view="${i}"><b>${'ABCD'[i]}</b>${x.name}</button>`).join('');
  document.getElementById('about').innerHTML=v.about;
  uid=0;LS=Math.max(6.5,Math.max(PH.w+G+p.w,2*p.w,PH.sw+G+s.w)*.032);
- document.getElementById('svg').innerHTML=v.draw(p,s);
+ const key=[st.view,st.paper,st.screen,st.cover].join();
+ if(key!==LASTKEY){LASTKEY=key;ANIM=null;st.opened=false;
+  document.getElementById('svg').innerHTML=v.draw(p,s);
+  if(ANIM)play();}
  document.getElementById('cap').innerHTML=`<span>Closed <b>${inch(p.w)} × ${inch(p.h)} in</b></span><span>Open <b>${inch(p.w*2)} × ${inch(p.h)} in</b></span><span>Picture <b>${inch(s.w)} × ${inch(s.h)} in</b></span>`;
  document.getElementById('paper').innerHTML=PAPER.map(q=>`<button class="${q.id===p.id?'on':''}" data-paper="${q.id}"><b>${q.name}</b><small>${inch(q.w)} × ${inch(q.h)} in</small></button>`).join('');
  document.getElementById('screen').innerHTML=SCREEN.map(q=>{const ok=fits(p,q),need=PAPER.find(x=>fits(x,q));
@@ -220,5 +223,16 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
  if(d.cover||d.mode||d.view||d.paper||d.screen||d.qi)render();
 });
 const m=location.hash.match(/^#([a-d])$/i);if(m)st.view='abcd'.indexOf(m[1].toLowerCase());
+// ---- Animation: zoom the frame with the brochure, so closed fills the space ----
+let ANIM=null,timers=[],vbRaf=0,LASTKEY='';
+function setVB(w,svg){svg.setAttribute('viewBox',`-6 -6 ${w+12} ${ANIM.h+12}`)}
+function zoomTo(w){const svg=document.querySelector('#svg svg');if(!svg||!ANIM)return;cancelAnimationFrame(vbRaf);
+ const from=+svg.getAttribute('viewBox').split(' ')[2]-12,t0=performance.now(),D=500;
+ const step=t=>{const k=Math.min(1,(t-t0)/D),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;setVB(from+(w-from)*e,svg);if(k<1)vbRaf=requestAnimationFrame(step)};vbRaf=requestAnimationFrame(step)}
+function setOpen(o){const g=document.querySelector('.bk');if(!g)return;st.opened=o;g.classList.toggle('open',o);
+ const t=document.getElementById('tapt');if(t)t.textContent=o?'Tap to close':'Tap to open';zoomTo(o?ANIM.wo:ANIM.wc)}
+function play(){timers.forEach(clearTimeout);const svg=document.querySelector('#svg svg');setVB(ANIM.wc,svg);
+ timers=[setTimeout(()=>setOpen(true),700),setTimeout(()=>setOpen(false),3600)]}
+function tapBook(){timers.forEach(clearTimeout);setOpen(!st.opened)}
 render();
 </script></body></html>
