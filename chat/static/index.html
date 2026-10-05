@@ -1,0 +1,141 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Comet — design your video brochure</title><meta name="robots" content="noindex"><link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="/logos.js"></script><script src="/logos2.js"></script><script src="/logos3.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+:root{--bg:#fff;--ink:#0F1222;--mute:#767884;--line:#E6E6EA;--soft:#F4F4F6;--accent:#2F4BFF;--tint:#EEF1FF}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.5 Archivo,system-ui,sans-serif;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+nav{display:flex;align-items:center;justify-content:space-between;padding:18px 26px;font-size:15px;color:var(--mute);position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);z-index:5}
+nav a{text-decoration:none}
+nav .new{display:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;color:var(--ink)}
+.chatting nav .new{display:inline-block}
+main{flex:1;width:100%;max-width:780px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column}
+
+/* intro */
+.intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4px 0 10px;min-height:calc(100svh - 230px)}
+.reel{position:relative;width:100%;max-width:640px;aspect-ratio:16/9;margin-bottom:14px}
+.reel img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transform:translateX(22px);transition:opacity .7s,transform .7s}
+.reel img.on{opacity:1;transform:none}.reel img.out{opacity:0;transform:translateX(-22px)}
+.intro h1{font-size:28px;font-weight:700;letter-spacing:-.015em;line-height:1.15}
+.intro .sub{color:var(--mute);margin-top:6px;font-size:17px}
+.chatting .intro{display:none}
+
+/* thread */
+.thread{display:none;flex-direction:column;gap:22px;padding:18px 0 28px}
+.chatting .thread{display:flex}
+.me{align-self:flex-end;background:var(--soft);padding:10px 16px;border-radius:18px;max-width:82%;white-space:pre-wrap;word-break:break-word;animation:rise .25s ease}
+.bot{align-self:stretch;animation:rise .3s ease}
+.bot>*+*{margin-top:12px}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+.work{display:flex;align-items:center;gap:10px;color:var(--mute);font-size:15px}
+.work i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+.work b{font-weight:500;color:var(--ink)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{color:#B3261E;font-size:15px}
+
+/* brief */
+.brief{display:flex;gap:16px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:14px 16px;flex-wrap:wrap}
+.brief .logo{height:44px;max-width:160px;display:grid;place-items:center}
+.brief .logo img{max-height:44px;max-width:160px;object-fit:contain}
+.brief .logo.dark{background:#111;border-radius:8px;padding:6px 10px}
+.brief .sw{display:flex;gap:6px}
+.brief .sw span{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.brief .meta{font-size:14px;color:var(--mute);line-height:1.35;flex:1;min-width:180px}
+.brief .meta b{display:block;color:var(--ink);font-size:16px;font-weight:600}
+
+/* covers */
+.covers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.covers button{text-align:left;font-size:14px;color:var(--mute);border-radius:12px;padding:0;position:relative}
+.covers .img{aspect-ratio:1260/888;border-radius:10px;overflow:hidden;background:var(--soft);box-shadow:0 1px 3px rgba(0,0,0,.12),0 8px 20px -10px rgba(0,0,0,.3);transition:transform .2s,box-shadow .2s}
+.covers .img img{width:100%;height:100%;object-fit:cover;display:block;animation:fade .5s}
+.covers button:hover .img{transform:translateY(-2px)}
+.covers button.on .img{box-shadow:0 0 0 2.5px var(--accent),0 8px 20px -10px rgba(0,0,0,.3)}
+.covers button span{display:block;margin-top:7px}
+.covers button.on span{color:var(--ink);font-weight:600}
+.covers button[disabled]{cursor:default}
+.shimmer{background:linear-gradient(100deg,var(--soft) 30%,#e9e9ee 50%,var(--soft) 70%)!important;background-size:300% 100%!important;animation:sh 1.4s linear infinite}
+@keyframes sh{from{background-position:100% 0}to{background-position:0 0}}
+@keyframes fade{from{opacity:0}}
+
+/* 3d */
+.stage{position:relative;width:100%;aspect-ratio:16/10;border-radius:18px;background:radial-gradient(ellipse 70% 60% at 50% 45%,#fff,#f1f1f3);overflow:hidden;touch-action:pan-y}
+.stage canvas{width:100%!important;height:100%!important;display:block}
+.stage .hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:13px;color:#9a9aa3;pointer-events:none}
+.stage .badge{position:absolute;left:14px;top:12px;font-size:13px;color:var(--mute);display:flex;gap:8px;align-items:center}
+.stage .badge i{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+.pages{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pages figure{font-size:12.5px;color:var(--mute)}
+.pages img,.pages canvas{width:100%;aspect-ratio:1260/888;object-fit:cover;border-radius:6px;display:block;box-shadow:0 1px 3px rgba(0,0,0,.15);background:var(--soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:14.5px;color:#333;transition:border-color .15s}
+.chips button:hover{border-color:var(--ink)}
+.chips button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chips button small{display:block;font-size:12px;color:var(--mute);line-height:1.2}
+.chips button.on small{color:#c8c8d0}
+.chips button.off{opacity:.45}
+
+/* pricing */
+.price{border:1px solid var(--line);border-radius:18px;padding:16px}
+.price>*+*{margin-top:14px}
+.price h4{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600;margin-bottom:7px}
+.draw svg{width:100%;height:auto;max-height:420px;display:block}
+.dims{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:#555}
+.total{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.total b{font-size:34px;letter-spacing:-.02em;font-weight:800}
+.total span{color:var(--mute)}
+.tip{font-size:14.5px;background:var(--tint);border-radius:10px;padding:9px 12px;color:#26307a}
+.buy{display:inline-block;background:var(--accent);color:#fff;font-weight:700;padding:13px 22px;border-radius:999px;font-size:16px}
+.fine{font-size:12.5px;color:var(--mute)}
+form.order{display:flex;gap:8px;flex-wrap:wrap}
+form.order input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font:inherit;font-size:16px}
+
+/* composer */
+.composer{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);padding:16px 0 calc(16px + env(safe-area-inset-bottom))}
+.box{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:26px;padding:6px 6px 6px 8px;box-shadow:0 2px 14px rgba(15,18,34,.07);transition:border-color .2s}
+.box:focus-within{border-color:#c9cbd6}
+.box textarea{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font:400 17px/1.4 Archivo;resize:none;padding:8px 6px;max-height:140px;min-width:0}
+.box .clip{color:var(--mute);width:38px;height:38px;border-radius:50%;display:grid;place-items:center}
+.box .clip:hover{background:var(--soft)}
+.box .send{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;flex:none}
+.box .send:disabled{background:#c9cbd6}
+.starters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.starters button{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:15px;color:#333;background:var(--bg)}
+.starters button:hover{border-color:var(--ink)}
+.chatting .starters{display:none}
+.composer .fine{text-align:center;margin-top:9px}
+.attached{font-size:13px;color:var(--mute);margin:0 0 6px 14px}
+@media(max-width:600px){nav{padding:14px 16px}.intro h1{font-size:22px}.intro .sub{font-size:15px}.covers{gap:7px}.covers button{font-size:12.5px}.pages{grid-template-columns:repeat(2,1fr)}.stage{aspect-ratio:4/3.6}.total b{font-size:28px}.starters button{font-size:14px;padding:6px 11px}}
+</style></head><body>
+<nav><a href="/" id="navlogo" aria-label="Comet"></a><span><button class="new" id="restart">New design</button> <a href="tel:+18045063291">(804) 506-3291</a></span></nav>
+<main>
+ <section class="intro">
+  <div class="reel" id="reel">
+   <img class="on" src="/site/img/p12.webp" alt="Example video brochure"><img src="/site/img/p10.webp" alt=""><img src="/site/img/p8.webp" alt=""><img src="/site/img/p3.webp" alt=""><img src="/site/img/p7.webp" alt=""><img src="/site/img/p13.webp" alt="">
+  </div>
+  <h1>Video brochures, designed and priced online.</h1>
+  <p class="sub">Paste your website. Your design is ready in about a minute.</p>
+ </section>
+ <section class="thread" id="thread" aria-live="polite"></section>
+ <div class="composer">
+  <div class="attached" id="attached" hidden></div>
+  <form class="box" id="form">
+   <button type="button" class="clip" id="clip" aria-label="Attach your logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 11.5l-8.6 8.6a5 5 0 01-7.1-7.1l8.6-8.6a3.3 3.3 0 014.7 4.7l-8.6 8.6a1.7 1.7 0 01-2.4-2.4l7.9-7.9"/></svg></button>
+   <input type="file" id="file" accept="image/*" hidden>
+   <textarea id="msg" rows="1" placeholder="Paste your website, or describe your brochure" aria-label="Message"></textarea>
+   <button class="send" id="send" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+  </form>
+  <div class="starters" id="starters">
+   <button data-say="Design one from my website">Design one from my website</button>
+   <button data-say="What sizes and prices do you have?">Sizes and prices</button>
+   <button data-say="I need 200 for a trade show">I need 200 for a trade show</button>
+  </div>
+  <p class="fine">Free to design. Orders from 25. Prices shown are samples.</p>
+ </div>
+</main>
+<script type="module" src="/static/app.js"></script>
+</body></html>

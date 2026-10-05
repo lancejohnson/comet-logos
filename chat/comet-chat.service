@@ -1,0 +1,12 @@
+[Unit]
+Description=Comet AI designer chat (prototype, tailnet only)
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/apps/comet-logos
+ExecStart=/usr/bin/python3 %h/apps/comet-logos/chat/server.py
+Environment=PORT=8131
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
