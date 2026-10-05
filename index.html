@@ -90,6 +90,6 @@ function draw(){
   <div class="cap"><b>${n}</b><span>${d}</span></div></div>`}).join('');
  $('mx').innerHTML=`<tr><th></th>${PAL.map(p=>`<th>${p.n}</th>`).join('')}</tr>`+PICKS.map(([k,n])=>`<tr><td>${n}</td>${PAL.map(p=>`<td class="${p===cur?'pick':''}">${logo(k,p,{size:22})}</td>`).join('')}</tr>`).join('');
 }
-document.addEventListener('click',e=>{const b=e.target.closest('.sw');if(b){cur=PAL.find(p=>p.k===b.dataset.k);history.replaceState(null,'','#'+cur.k);draw()}});
+document.addEventListener('click',e=>{const b=e.target.closest('.sw');if(b){cur=PAL.find(p=>p.k===b.dataset.k);draw();try{history.replaceState(null,'',location.pathname+location.search+'#'+cur.k)}catch(_){}}});
 addEventListener('DOMContentLoaded',draw);
 </script></body></html>
