@@ -81,7 +81,10 @@ function drawScreen(s, img, t, on) {
   const z = 1.18 - 0.14 * k, iw = img.width, ih = img.height;
   const sw = iw / z, sh = sw * h / w;
   g.drawImage(img, (iw - sw) * (0.2 + 0.6 * k), Math.max(0, (ih - sh) / 2), sw, Math.min(ih, sh), 0, 0, w, h);
-  const fade = Math.min(1, sec / 0.6, (10 - sec) / 0.6); g.fillStyle = `rgba(0,0,0,${(1 - fade) * .55})`; g.fillRect(0, 0, w, h);
+  const since = (t - s.t0) / 1000;
+  const fade = since < 1 ? since : Math.min(1, sec / 0.6, (10 - sec) / 0.6);
+  g.fillStyle = `rgba(0,0,0,${since < 1 ? 1 - fade : (1 - fade) * .55})`; g.fillRect(0, 0, w, h);
+  if (since < 0.25) { g.fillStyle = `rgba(255,255,255,${0.6 * (1 - since / 0.25)})`; g.fillRect(0, 0, w, h); }
   g.fillStyle = 'rgba(255,255,255,.3)'; g.fillRect(36, h - 30, w - 72, 5); g.fillStyle = '#fff'; g.fillRect(36, h - 30, (w - 72) * k, 5);
   s.tex.needsUpdate = true;
 }
@@ -128,80 +131,96 @@ function makeBrochure() {
 
   const b = {root, m, edgeB, edgeC, scr, screenMesh, pivot, spine, shadow, angle: 0, target: 0, img: null,
     setBrand(t) { for (const k of ['front', 'inl', 'inr', 'back']) { m[k].map = t[k]; m[k].needsUpdate = true; } edgeB.color.copy(t.edgeBase); edgeC.color.copy(t.edgeCover); b.img = t.front.image; scr.t0 = performance.now(); },
-    update(t, dt, flat) {
-      b.angle = window.__snap ? b.target : b.angle + (b.target - b.angle) * Math.min(1, dt * 3);
+    playAt: Infinity,
+    update(t, dt) {
+      if (intro === null) b.angle += (b.target - b.angle) * Math.min(1, dt * 3);
       const a = b.angle, o = a / Math.PI;
       pivot.rotation.z = a;
       // spine: upright strip when closed, flat strip when open
-      const sw = THREE.MathUtils.lerp(.5, SPINE, o), sh = THREE.MathUtils.lerp(TB + TC, .24, o);
+      const oo = Math.min(1, o * 1.6), sw = THREE.MathUtils.lerp(.5, SPINE, oo), sh = THREE.MathUtils.lerp(TB + TC, .24, oo);
       spine.scale.set(sw, sh, 1); spine.position.set(-sw / 2, sh / 2, 0);
-      const left = THREE.MathUtils.lerp(0, -SPINE - W, o);
+      const left = -Math.max(0, Math.cos(Math.min(a, Math.PI)) < 0 ? -Math.cos(a) * W : 0) - Math.sin(Math.min(a, Math.PI / 2)) * 1.5;
       shadow.scale.set((W - left) * 1.15, D * 1.3, 1); shadow.position.x = (W + left) / 2;
-      const on = flat ? o > .6 : o > .15;
-      drawScreen(scr, b.img, t, on);
+      drawScreen(scr, b.img, t, t >= b.playAt && b.target > 0);
     },
   };
   return b;
 }
 
-// ---------- scene: one lying open, one standing behind it ----------
+// ---------- scene: one brochure, with an intro: lying closed, opening, then playing ----------
+const OPEN = 1.80;                         // cover stands just past upright
 const front = makeBrochure();
-front.root.position.set(SPINE / 2, 0, 3);   // centred when open
+front.root.position.set(-W / 2 + 3, 0, 0);
 scene.add(front.root);
+front.playAt = Infinity;
 
-const stand = makeBrochure();
-stand.root.rotation.set(Math.PI / 2, 0, 0);    // stand it on its bottom edge, cover facing the camera
-const standWrap = new THREE.Group(); standWrap.add(stand.root);
-stand.root.position.set(-W / 2, D / 2, -TB);
-standWrap.position.set(-7, 0, -13); standWrap.rotation.y = 0.32;
-stand.target = stand.angle = 0.45;
-stand.shadow.visible = false;
-scene.add(standWrap);
+const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+const cam = {
+  a: {pos: new THREE.Vector3(2, 58, 34), tgt: new THREE.Vector3(0, 0, 0)},
+  b: {pos: new THREE.Vector3(10, 29, 56), tgt: new THREE.Vector3(-1, 7.5, -1)},
+};
+let intro = null;          // start time of the intro, ms
+function startIntro() {
+  intro = performance.now(); front.angle = front.target = 0; front.playAt = Infinity;
+  controls.enabled = false; controls.autoRotate = false; spin.classList.remove('on');
+}
+function runIntro(now) {
+  const t = (now - intro) / 1000;
+  const k = ease((t - 0.6) / 2.2);                       // camera glide
+  camera.position.lerpVectors(cam.a.pos, cam.b.pos, k);
+  controls.target.lerpVectors(cam.a.tgt, cam.b.tgt, k);
+  front.angle = front.target = OPEN * ease((t - 0.9) / 1.6);   // cover opens
+  if (t > 2.6 && front.playAt === Infinity) { front.playAt = now; front.scr.t0 = now; }
+  if (t > 3.0) { intro = null; controls.enabled = true; }
+  camera.lookAt(controls.target);
+}
 
-// fit the camera
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false);
-  camera.aspect = w / h; camera.fov = w < 600 ? 34 : 26; camera.updateProjectionMatrix();
+  camera.aspect = w / h; camera.fov = w < 600 ? 38 : 26; camera.updateProjectionMatrix();
 }
-camera.position.set(8, 46, 66); controls.target.set(0, 3, -3);
 new ResizeObserver(resize).observe(stage); resize();
-if (stage.clientWidth < 600) camera.position.set(6, 60, 92);
+if (stage.clientWidth < 600) { cam.a.pos.set(0, 74, 46); cam.b.pos.set(9, 32, 68); cam.b.tgt.set(-1, 6, -1); }
+camera.position.copy(cam.a.pos); controls.target.copy(cam.a.tgt);
+controls.autoRotate = false;
 
 // ---------- interaction ----------
 const toggleBtn = document.getElementById('toggle');
-function setOpen(o) { front.target = o ? Math.PI : 0; toggleBtn.textContent = o ? 'Close' : 'Open'; }
+toggleBtn.textContent = 'Replay';
+const spin = document.getElementById('spin'); spin.classList.remove('on');
+spin.onclick = () => { controls.autoRotate = !controls.autoRotate; spin.classList.toggle('on', controls.autoRotate); };
+toggleBtn.onclick = () => startIntro();
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let pdown = null;
 renderer.domElement.addEventListener('pointerdown', e => { pdown = [e.clientX, e.clientY]; });
 renderer.domElement.addEventListener('pointerup', e => {
-  if (!pdown || Math.hypot(e.clientX - pdown[0], e.clientY - pdown[1]) > 5) return;
+  if (intro !== null || !pdown || Math.hypot(e.clientX - pdown[0], e.clientY - pdown[1]) > 5) return;
   const r = renderer.domElement.getBoundingClientRect(); ptr.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(ptr, camera);
-  if (ray.intersectObject(front.root, true).length) setOpen(front.target === 0);
-  else if (ray.intersectObject(standWrap, true).length) stand.target = stand.target > 1 ? .45 : 1.4;
+  if (ray.intersectObject(front.root, true).length) {
+    if (front.target > 0) { front.target = 0; front.playAt = Infinity; } else { front.target = OPEN; front.playAt = performance.now() + 1200; front.scr.t0 = front.playAt; }
+  }
 });
 controls.addEventListener('start', () => { document.getElementById('hint').style.opacity = 0; });
-toggleBtn.onclick = () => setOpen(front.target === 0);
-const spin = document.getElementById('spin');
-spin.onclick = () => { controls.autoRotate = !controls.autoRotate; spin.classList.toggle('on', controls.autoRotate); };
 
 const bar = document.getElementById('brands');
 bar.innerHTML = '<span>Design</span>' + BRANDS.map(([k, n], i) => `<button data-b="${k}" class="${i ? '' : 'on'}">${n}</button>`).join('');
 async function setBrand(k) {
-  const t = await loadBrand(k); front.setBrand(t); stand.setBrand(t);
+  const t = await loadBrand(k); front.setBrand(t);
   bar.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.b === k));
   try { history.replaceState(null, '', '#brand=' + k); } catch (e) {}
 }
-bar.onclick = e => { const b = e.target.closest('button'); if (b) setBrand(b.dataset.b); };
+bar.onclick = e => { const b = e.target.closest('button'); if (b) setBrand(b.dataset.b).then(startIntro); };
 
 const clock = new THREE.Clock();
 renderer.setAnimationLoop(t => {
   const dt = Math.min(clock.getDelta(), .05);
-  front.update(t, dt, true); stand.update(t, dt, false);
-  controls.update(); renderer.render(scene, camera);
+  if (window.__at != null) { if (intro === null) startIntro(); intro = t - window.__at * 1000; }
+  if (intro !== null) runIntro(t); else controls.update();
+  front.update(t, dt); renderer.render(scene, camera);
 });
 
 const start = (new URLSearchParams(location.hash.slice(1)).get('brand')) || 'Netflix';
 setBrand(BRANDS.some(b => b[0] === start) ? start : 'Netflix').then(() => {
   document.getElementById('loading').remove();
-  setTimeout(() => setOpen(true), 500);
+  startIntro();
   window.__ready = true;
 });
