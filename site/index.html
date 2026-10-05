@@ -104,6 +104,35 @@ body:not(.has-chat) .composer{display:none}
  .s-panel .reel{padding:14px;border-radius:20px;aspect-ratio:4/3}.s-panel .reel img{inset:14px;width:calc(100% - 28px);height:calc(100% - 28px)}.s-panel .intro p{font-size:24px!important}
  .s-big .intro p{font-size:40px!important}
 }
+
+/* ---------- button options (all on the Clean style) ---------- */
+.cta small{display:none}
+/* Links: plain underlined text, no boxes */
+.b-links .ctas{gap:14px;margin-top:18px}
+.b-links .cta{border:0;background:none!important;color:var(--ink)!important;padding:2px 0;font-size:19px;font-weight:500;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:5px;text-decoration-color:var(--accent)}
+.b-links .cta.primary{font-weight:700}
+/* Rows: a short menu with hairlines */
+.b-rows .ctas{gap:0;max-width:420px;border-top:1px solid var(--line);margin-top:24px}
+.b-rows .cta{display:flex;justify-content:space-between;align-items:baseline;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none!important;color:var(--ink)!important;padding:16px 4px;font-size:18px;font-weight:600;text-align:left}
+.b-rows .cta small{display:inline;font-size:15px;font-weight:400;color:var(--mute)}
+.b-rows .cta:hover span{color:var(--accent)}
+/* Chips: two small chat-suggestion bubbles */
+.b-chips .ctas{flex-direction:row;justify-content:center;gap:8px;max-width:none;margin-top:20px}
+.b-chips .cta{border:1px solid var(--line);background:var(--soft)!important;color:var(--ink)!important;border-radius:14px;padding:10px 16px;font-size:16px;font-weight:500}
+.b-chips .cta.primary{border-color:var(--accent)}
+/* Compose: looks like a chat box with the two choices inside */
+.b-compose .ctas{flex-direction:row;flex-wrap:wrap;gap:8px;max-width:520px;border:1px solid var(--line);border-radius:22px;padding:44px 12px 12px;position:relative;margin-top:22px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.b-compose .ctas::before{content:"What would you like to do?";position:absolute;left:18px;top:14px;color:var(--mute);font-size:16px}
+.b-compose .cta{border:1px solid var(--line);background:var(--bg)!important;color:var(--ink)!important;border-radius:999px;padding:8px 14px;font-size:15px;font-weight:500}
+/* Square: two equal thin rectangles, no fill, small corners */
+.b-square .ctas{max-width:280px;gap:8px}
+.b-square .cta{background:none!important;color:var(--ink)!important;border:1px solid var(--ink);border-radius:4px;padding:12px 18px;font-size:16px;font-weight:500}
+.b-square .cta.primary{border-color:var(--accent);color:var(--accent)!important}
+/* Small: one compact solid button, the other a text link under it */
+.b-small .ctas{align-items:center;gap:12px}
+.b-small .cta{border:0;background:none!important;color:var(--ink)!important;padding:4px;font-size:16px;font-weight:500;text-decoration:underline;text-underline-offset:4px}
+.b-small .cta.primary{background:var(--accent)!important;color:var(--onaccent)!important;border-radius:8px;padding:11px 22px;text-decoration:none;font-weight:600}
+@media(max-width:600px){.b-compose .ctas,.b-rows .ctas{max-width:none}}
 </style></head><body>
 <div class="review" id="review"></div>
 <nav><span id="navlogo"></span><a>(804) 506-3291</a></nav>
@@ -118,8 +147,8 @@ body:not(.has-chat) .composer{display:none}
   <div class="copy">
   <p>Video brochures, designed and priced online.</p>
   <div class="ctas">
-   <button class="cta primary" data-s="price"><span>Get Pricing</span></button>
-   <button class="cta" data-s="design"><span>Design Your Own</span></button>
+   <button class="cta primary" data-s="price"><span>Get Pricing</span><small>From $18 each</small></button>
+   <button class="cta" data-s="design"><span>Design Your Own</span><small>Free, about a minute</small></button>
   </div>
   </div>
  </div>
@@ -182,22 +211,23 @@ const go=()=>{clearInterval(timer);timer=setInterval(()=>show(ri+1),2600)};go();
 $('dots').onclick=e=>{const d=e.target.closest('button');if(d){show(+d.dataset.i);go()}};
 
 // ---------- review toolbar: style / colour / logo, kept in the address as ?style=&colour=&logo= ----------
-const STYLES=[['clean','Clean'],['split','Split'],['dark','Dark'],['panel','Panel'],['big','Big type']];
+const STYLES=[['clean','Clean']];
+const BUTTONS=[['rows','Menu rows'],['links','Text links'],['small','Small button + link'],['chips','Chat chips'],['compose','Chat box'],['square','Thin boxes'],['pill','Original pills']];
 const COLOURS={cobalt:{n:'Cobalt',accent:'#2F4BFF',on:'#fff',tint:'#EEF1FF',dark:'#6F86FF',ink:'#0F1222'},
  amber:{n:'Amber',accent:'#E89A00',on:'#111',tint:'#FFF4DA',dark:'#FFB423',ink:'#17140E'},
  black:{n:'Black',accent:'#111111',on:'#fff',tint:'#F2F2F2',dark:'#FFFFFF',ink:'#111111'}};
 const LOGOSET=[['ss_clean','Shooting Star'],['ss_twotone','Two-Tone Tail'],['ss_speed','Speed Lines'],['trail','Dot Trail'],['playc','Play C'],['tile','Tile']];
 const qs=new URLSearchParams(location.search.includes('style=')?location.search:location.hash.slice(1));
-const R={style:qs.get('style')||'clean',colour:qs.get('colour')||'cobalt',logo:qs.get('logo')||'ss_clean'};
+const R={style:'clean',btn:qs.get('btn')||'rows',colour:qs.get('colour')||'cobalt',logo:qs.get('logo')||'ss_clean'};
 function applyReview(){
  const c=COLOURS[R.colour],dark=R.style==='dark',a=dark?c.dark:c.accent;
- document.body.className=document.body.className.replace(/\bs-\w+/g,'').trim()+' s-'+R.style;
+ document.body.className=document.body.className.replace(/\b[sb]-\w+/g,'').trim()+' s-'+R.style+' b-'+R.btn;
  const st=document.documentElement.style;st.setProperty('--accent',a);st.setProperty('--onaccent',dark&&R.colour==='black'?'#111':c.on);st.setProperty('--tint',c.tint);
  if(!dark)st.setProperty('--ink',R.colour==='black'?'#111':c.ink);else st.removeProperty('--ink');
  $('navlogo').innerHTML=LOGOS[R.logo].html({ink:dark?'#fff':c.ink,accent:a,size:22});
  const grp=(k,label,items)=>`<div class="g"><span>${label}</span>${items.map(([v,n,dot])=>`<button data-r="${k}" data-v="${v}" class="${R[k]===v?'on':''}">${dot?`<i style="background:${dot}"></i>`:''}${n}</button>`).join('')}</div>`;
- $('review').innerHTML='<b style="color:#fff">Comet homepage options</b>'+grp('style','Style',STYLES)+grp('colour','Colour',Object.entries(COLOURS).map(([k,v])=>[k,v.n,v.accent]))+grp('logo','Logo',LOGOSET)+'<a href="../index.html" style="color:#aaa;text-decoration:underline">Logo sheet</a>';
- try{history.replaceState(null,'',location.pathname+location.search.replace(/[?&]?(style|colour|logo)=[^&]*/g,'').replace(/^&/,'?')+'#style='+R.style+'&colour='+R.colour+'&logo='+R.logo)}catch(_){}
+ $('review').innerHTML='<b style="color:#fff">Comet homepage options</b>'+grp('btn','Buttons',BUTTONS)+grp('colour','Colour',Object.entries(COLOURS).map(([k,v])=>[k,v.n,v.accent]))+grp('logo','Logo',LOGOSET)+'<a href="../index.html" style="color:#aaa;text-decoration:underline">Logo sheet</a>';
+ try{history.replaceState(null,'',location.pathname+location.search.replace(/[?&]?(style|btn|colour|logo)=[^&]*/g,'').replace(/^&/,'?')+'#btn='+R.btn+'&colour='+R.colour+'&logo='+R.logo)}catch(_){}
 }
 $('review').onclick=e=>{const b=e.target.closest('button');if(b){R[b.dataset.r]=b.dataset.v;applyReview()}};
 applyReview();
