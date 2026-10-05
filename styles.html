@@ -1,8 +1,8 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Comet logo options</title>
+<title>Comet logo styles, round 4</title>
 <meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&display=block" rel="stylesheet">
-<script src="logos.js"></script><script src="logos2.js"></script><script src="logos3.js"></script>
+<script src="logos.js"></script><script src="logos2.js"></script><script src="logos3.js"></script><script src="logos4.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#fff;color:#111;font:400 16px/1.5 Archivo,sans-serif}
@@ -42,7 +42,7 @@ tr td.pick{background:#FAFAFA}
 footer{border-top:1px solid #eee;padding:24px 0 40px;color:#888;font-size:14px}
 @media(max-width:760px){.wrap{padding:0 16px}.bar .wrap{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.sw{flex:none}h1{font-size:26px}.cards{grid-template-columns:1fr}.card .main{height:150px}.card .row{height:104px}.card .app{width:58px;height:58px;border-radius:14px}}
 </style></head><body>
-<header><div class="wrap"><h1>Comet logo options</h1><p>Six logos in ten colour schemes. Tap a colour to see every logo in it. The full grid at the bottom shows all of them side by side. <a href="styles.html" style="color:#111;text-decoration:underline">New styles (serif, script and more) →</a> · <a href="site/index.html" style="color:#111;text-decoration:underline">See the clickable homepage →</a></p></div></header>
+<header><div class="wrap"><h1>Comet logo styles: new directions</h1><p>Eight logos in different moods: serifs, a script, a slab, a wide sporty one and a techy one. Tap a colour to see every logo in it. <a href="index.html" style="color:#111;text-decoration:underline">See the earlier logos →</a> <a href="site/index.html" style="color:#111;text-decoration:underline">See the clickable homepage →</a></p></div></header>
 <div class="bar"><div class="wrap" id="sw"><span class="k">Colour</span></div></div>
 <main class="wrap"><div class="cards" id="cards"></div>
 <section class="matrix"><h2>Every logo in every colour</h2><p>Scroll sideways on a phone. The selected colour is shaded.</p><div class="scroll"><table id="mx"></table></div></section></main>
@@ -51,23 +51,18 @@ footer{border-top:1px solid #eee;padding:24px 0 40px;color:#888;font-size:14px}
 // ink = text colour on light backgrounds, accent = logo colour, night = dark background, dark = logo colour on dark background
 const PAL=[
  {k:'cobalt',n:'Cobalt',ink:'#0F1222',accent:'#2F4BFF',night:'#0F1222',dark:'#6F86FF'},
- {k:'violet',n:'Violet',ink:'#15111F',accent:'#6A3CF5',night:'#15111F',dark:'#9B7BFF'},
- {k:'orange',n:'Signal orange',ink:'#141414',accent:'#FF5B14',night:'#141414',dark:'#FF6F2E'},
  {k:'amber',n:'Amber',ink:'#17140E',accent:'#E89A00',night:'#17140E',dark:'#FFB423'},
- {k:'teal',n:'Teal',ink:'#0D1A1A',accent:'#0A8F7F',night:'#0D1A1A',dark:'#2FD0B8'},
- {k:'navysky',n:'Navy and sky',ink:'#0B1F3A',accent:'#3D8BFF',night:'#0B1F3A',dark:'#6BAAFF'},
- {k:'forest',n:'Forest and lime',ink:'#10261C',accent:'#4CAF1F',night:'#10261C',dark:'#B6F03C'},
- {k:'magenta',n:'Magenta',ink:'#18111A',accent:'#D61F8C',night:'#18111A',dark:'#FF52B5'},
  {k:'mono',n:'Black only',ink:'#111111',accent:'#111111',night:'#111111',dark:'#FFFFFF'},
- {k:'red',n:'Current red',ink:'#111111',accent:'#E8304A',night:'#111111',dark:'#FF4A62'},
 ];
 const PICKS=[
- ['ss_clean','Shooting Star','Solid tail and round head'],
- ['ss_twotone','Two-Tone Tail','Tail in the text colour, head in colour'],
- ['ss_speed','Speed Lines','Head with three trailing lines'],
- ['trail','Dot Trail','A comet made of four shrinking dots'],
- ['playc','Play C','Heavy C with a play button inside'],
- ['tile','Tile','Square icon with a c and a dot'],
+ ['sf_italic','Editorial Italic','Magazine-style italic serif; the full stop is a comet'],
+ ['sf_soft','Soft Serif','Heavy rounded serif with a twinkle over the t'],
+ ['sf_didone','Classic Caps','Elegant serif capitals under a hairline comet'],
+ ['seal','Seal','Round badge, like a stamp or sticker'],
+ ['script','Retro Script','1950s sign script with a shooting-star swash'],
+ ['label','Slab Label','Slab serif on a solid tag'],
+ ['wide','Wide','Extra-wide capitals with speed slashes'],
+ ['mono','Terminal','Monospace with a typing cursor'],
 ];
 let cur=PAL.find(p=>p.k===location.hash.slice(1))||PAL[0];
 const $=id=>document.getElementById(id);
