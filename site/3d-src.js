@@ -8,7 +8,7 @@ const W = 21.0, D = 14.8;            // each panel 210 x 148 mm (A5 landscape)
 const TB = 0.70, TC = 0.25;          // screen panel and cover thickness
 const SPINE = 1.0;                   // spine width when lying open
 const SCR = {x: 6.08, y: 4.13, w: 9.70, h: 5.40};   // screen window, from the panel's top-left corner
-const PX = -SPINE / 2, PY = (TB + TC) / 2;           // hinge pivot
+const PX = 0, PY = TB;           // hinge: the cover turns about the top-left edge of the screen panel, so there is never a gap
 
 const BRANDS = [
   ['Netflix', 'Netflix'], ['MicrosoftAzureAI', 'Azure'], ['SAP', 'SAP'], ['Salesforce', 'Salesforce'],
@@ -137,8 +137,10 @@ function makeBrochure() {
       const a = b.angle, o = a / Math.PI;
       pivot.rotation.z = a;
       // spine: upright strip when closed, flat strip when open
-      const oo = Math.min(1, o * 1.6), sw = THREE.MathUtils.lerp(.5, SPINE, oo), sh = THREE.MathUtils.lerp(TB + TC, .24, oo);
-      spine.scale.set(sw, sh, 1); spine.position.set(-sw / 2, sh / 2, 0);
+      // spine: a strip from the panel's bottom-left edge to the cover's outer hinge edge
+      const ex = -TC * Math.sin(a), ey = TB + TC * Math.cos(a), len = Math.max(.05, Math.hypot(ex, ey));
+      spine.scale.set(.14, len, 1); spine.rotation.z = Math.atan2(-ex, ey);
+      spine.position.set(ex / 2 - .07 * Math.cos(spine.rotation.z), ey / 2 - .07 * Math.sin(spine.rotation.z), 0);
       const left = -Math.max(0, Math.cos(Math.min(a, Math.PI)) < 0 ? -Math.cos(a) * W : 0) - Math.sin(Math.min(a, Math.PI / 2)) * 1.5;
       shadow.scale.set((W - left) * 1.15, D * 1.3, 1); shadow.position.x = (W + left) / 2;
       const on = b.manual ? b.screenOn : (t >= b.playAt && b.target > 0);
@@ -175,6 +177,7 @@ function resize() {
   camera.aspect = w / h; camera.fov = w < 600 ? 38 : 26; camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(stage); resize();
+window.__cam = (p, t) => { controls.autoRotate = false; setCam(p, t); };
 function setCam(pos, tgt) { camera.position.set(...pos); controls.target.set(...tgt); camera.lookAt(controls.target); }
 
 // tap on a brochure to open or close it (used by several views)
@@ -233,7 +236,7 @@ function timelineBrochure() {
     h.position.set(0, Math.sin(Math.PI * flip) * 7 + (TB + TC) * flip, 0);
     h.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.PI * 2 * spinK);
     // keep the open spread centred
-    b.root.position.x = -W / 2 + (W / 2 + SPINE / 2) * open;
+    b.root.position.x = -W / 2 + (W / 2) * open;
   };
 }
 function viewSlider() {
@@ -281,7 +284,7 @@ function viewDisplay() {
   // turn so the screen panel faces the camera
   g.rotation.y = -0.55; g.position.set(-3, 0, 2);
   const disc = new THREE.Mesh(new THREE.CylinderGeometry(19, 19, .4, 96), new THREE.MeshPhysicalMaterial({color: 0xf4f4f5, roughness: .5, clearcoat: .3}));
-  disc.position.y = -.2; disc.receiveShadow = true; scene.add(disc);
+  disc.position.y = -.2; disc.receiveShadow = true; scene.add(disc); ground.visible = false;   // the disc takes the shadow; two surfaces at one height flicker
   scene.add(g); g.position.y = 0;
   setCam(isPhone ? [0, 30, 96] : [0, 20, 70], [0, 6, 0]);
   onTap = tapOpenClose(2.2);
@@ -308,14 +311,15 @@ function viewLineup() {
 
 // ---------- Two brochures: the first version, one open flat and one standing ----------
 function viewTwo() {
-  const f = add(makeBrochure()); f.root.position.set(SPINE / 2, 0, 3); scene.add(f.root);
+  const f = add(makeBrochure()); f.root.position.set(0, 0, 4); scene.add(f.root);
   f.target = Math.PI; f.playAt = performance.now() + 1500;
   const st = add(makeBrochure());
   st.root.rotation.set(Math.PI / 2, 0, 0); st.root.position.set(-W / 2, D / 2, -TB);
   const wrap = new THREE.Group(); wrap.add(st.root); wrap.position.set(-7, 0, -13); wrap.rotation.y = .32; scene.add(wrap); st.holder = wrap;
   st.target = st.angle = .45; st.shadow.visible = false;
   setCam(isPhone ? [6, 60, 92] : [14, 17, 40].map(v => v * 1.55), [0, 3, -3]);
-  onTap = b => { if (b === f) tapOpenClose(Math.PI)(b); else b.target = b.target > 1 ? .45 : 1.4; };
+  // the standing one only rocks between closed and slightly open, so it never reaches the one lying in front
+  onTap = b => { if (b === f) tapOpenClose(Math.PI)(b); else b.target = b.target > .2 ? 0 : .45; };
   controls.autoRotate = true; spin.classList.add('on');
   toggleBtn.onclick = () => { f.target = 0; f.playAt = Infinity; setTimeout(() => { f.target = Math.PI; f.playAt = performance.now() + 1200; }, 1400); };
 }
