@@ -1,5 +1,5 @@
 // Comet AI designer — chat front end. Talks to chat/server.py.
-import * as viewer from '/static/viewer.js';
+import * as viewer from './viewer.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -33,7 +33,7 @@ async function api(path, body) {
 async function poll(job, onPart) {
   const seen = new Set();
   for (;;) {
-    const j = await api('/api/job/' + job);
+    const j = await api('api/job/' + job);
     for (const [k, v] of Object.entries(j.results)) if (!seen.has(k)) { seen.add(k); onPart?.(k, v); }
     if (j.done) return j;
     await sleep(1500);
@@ -64,7 +64,7 @@ async function brandLogo(b) {
     s = s.replace(/currentColor/g, b.colors?.dark || '#111');
     const png = await rasterize('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s)); if (png) return png;
   }
-  if (b.logo_url) return rasterize('/api/logo?url=' + encodeURIComponent(b.logo_url));
+  if (b.logo_url) return rasterize('api/logo?url=' + encodeURIComponent(b.logo_url));
   return null;
 }
 function isLight(hex) { const n = parseInt((hex || '#fff').slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 > 150; }
@@ -121,7 +121,7 @@ async function design(request, urls) {
   hold(true);
   try {
     const w = working(urls.length ? `Reading ${urls[0].replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*/, '')}` : 'Working out a brief');
-    const b = await api('/api/brief', {request, urls});
+    const b = await api('api/brief', {request, urls});
     st.brief = b; st.logo = await brandLogo(b);
     w.done(`<p>${esc(b.summary || `Here’s what I found for ${b.brand_name}.`)}</p>${briefCard(b, st.logo)}`);
     if (!st.logo) say('<p class="fine">I couldn’t get a clean copy of your logo, so the designs will spell out the name. Attach your logo with the paperclip for the real one.</p>');
@@ -132,7 +132,7 @@ async function design(request, urls) {
 
 async function covers() {
   const msg = say(`<p>Three covers coming up — about 30 seconds.</p><div class="covers">${STYLES.map((s, i) => `<button disabled data-cover="${i}"><div class="img shimmer"></div><span>${s}</span></button>`).join('')}</div>`);
-  const r = await api('/api/covers', {brief: st.brief, logo: st.logo});
+  const r = await api('api/covers', {brief: st.brief, logo: st.logo});
   st.id = r.id; st.covers = []; st.chosen = null; st.faces = {}; setHash();
   const j = await poll(r.job, (k, url) => {
     const i = +k.slice(5); st.covers[i] = url;
@@ -150,7 +150,7 @@ async function choose(i, el) {
   st.chosen = i; st.faces = {front: st.covers[i]}; st.inr = await composeInr(null, st.brief, st.logo);
   showStage(`Here it is in 3D. Drag to turn it, tap to open or close.`, true);
   try {
-    const r = await api('/api/faces', {id: st.id, cover: i}); setHash();
+    const r = await api('api/faces', {id: st.id, cover: i}); setHash();
     const j = await poll(r.job, (k, url) => { st.faces[k] = url; refreshFaces(k); });
     st.stageMsg.querySelector('.badge')?.remove();
     if (Object.keys(j.errors).length) say(`<p class="err">${Object.keys(j.errors).map(k => FACES[k]).join(', ')} didn’t come out. Say “redo the ${FACES[Object.keys(j.errors)[0]].toLowerCase()}” to try again.</p>`);
@@ -191,7 +191,7 @@ async function edit(what, faces) {
   const names = (faces || Object.keys(FACES)).filter(k => st.faces[k]);
   const w = working(`Changing the ${names.map(k => FACES[k].toLowerCase()).join(', ')}`);
   try {
-    const r = await api('/api/edit', {id: st.id, edit: what, faces: names});
+    const r = await api('api/edit', {id: st.id, edit: what, faces: names});
     const j = await poll(r.job, (k, url) => { st.faces[k] = url; refreshFaces(k); });
     w.done(Object.keys(j.errors).length ? `<p class="err">Some pages didn’t change: ${Object.keys(j.errors).map(k => FACES[k]).join(', ')}.</p>` : undefined);
     showStage('Updated. Anything else?', false);
@@ -218,7 +218,7 @@ let uid = 0;
 const img = (href, x, y, w, h, clip) => `<image href="${href}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"${clip ? ` clip-path="url(#${clip})"` : ''}/>`;
 const shadow = (x, y, w, h) => `<rect x="${x + 2}" y="${y + 3}" width="${w}" height="${h}" rx="1.5" fill="rgba(0,0,0,.2)" filter="url(#blur)"/>`;
 function art() {
-  return {cover: st.faces.front || '/site/img/pc/cover.webp', inl: st.faces.inl || '/site/img/pc/inside.webp', inr: st.inr?.toDataURL ? (st._inrUrl ||= st.inr.toDataURL('image/jpeg', .8)) : null};
+  return {cover: st.faces.front || 'site/img/pc/cover.webp', inl: st.faces.inl || 'site/img/pc/inside.webp', inr: st.inr?.toDataURL ? (st._inrUrl ||= st.inr.toDataURL('image/jpeg', .8)) : null};
 }
 function closed(x, y, p) { const id = 'k' + (++uid), a = art();
   return shadow(x, y, p.w, p.h) + `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${p.w}" height="${p.h}" rx="1.2"/></clipPath></defs>${img(a.cover, x, y, p.w, p.h, id)}`; }
@@ -284,7 +284,7 @@ function orderForm() {
     <p class="fine">No payment yet. We’ll email a print proof and checkout link.</p>`);
   m.querySelector('form').onsubmit = async e => {
     e.preventDefault(); const [em, nm] = m.querySelectorAll('input');
-    await api('/api/order', {design: st.id, email: em.value, name: nm.value, paper: p.id, screen: s.id, cover: st.cover, qty: n, total: u * n, link: location.href}).catch(() => {});
+    await api('api/order', {design: st.id, email: em.value, name: nm.value, paper: p.id, screen: s.id, cover: st.cover, qty: n, total: u * n, link: location.href}).catch(() => {});
     m.innerHTML = `<p>Thanks. We’ll email the proof to <b>${esc(em.value)}</b> within one business day.</p>`;
   };
 }
@@ -298,7 +298,7 @@ async function send(text) {
   const t = working('…'); t.el.querySelector('b').textContent = '';
   let r;
   try {
-    r = await api('/api/chat', {message: text, state: {brand: st.brief?.brand_name, has_covers: !!st.covers.length, cover_chosen: st.chosen !== null, pages: Object.keys(st.faces), paper: st.paper, screen: st.screen, qty: st.qty, cover: st.cover}});
+    r = await api('api/chat', {message: text, state: {brand: st.brief?.brand_name, has_covers: !!st.covers.length, cover_chosen: st.chosen !== null, pages: Object.keys(st.faces), paper: st.paper, screen: st.screen, qty: st.qty, cover: st.cover}});
   } catch (e) { t.done(`<p class="err">${esc(e.message)}</p>`); return; }
   t.done(r.reply ? `<p>${esc(r.reply)}</p>` : undefined);
   if (r.paper && PAPER.some(p => p.id === r.paper)) { st.paper = r.paper; st.screen = P().def; }
@@ -314,10 +314,10 @@ async function send(text) {
 function setHash() { history.replaceState(null, '', st.id ? '#d=' + st.id : location.pathname); }
 async function restore(id) {
   try {
-    const d = await api('/api/design/' + id);
+    const d = await api('api/design/' + id);
     st.id = d.id; st.brief = d.brief; st.chosen = d.chosen ?? null; st.faces = d.faces || {};
-    st.covers = [0, 1, 2].map(i => `/files/${d.id}/cover${i}.jpg`);
-    st.logo = d.has_logo ? `/files/${d.id}/logo.png` : null;
+    st.covers = [0, 1, 2].map(i => `files/${d.id}/cover${i}.jpg`);
+    st.logo = d.has_logo ? `files/${d.id}/logo.png` : null;
     say(`<p>Welcome back. Here’s the design for ${esc(d.brief.brand_name)}.</p>${briefCard(d.brief, st.logo)}`);
     if (st.chosen === null) {
       say(`<p>Pick a cover, or tell me what to change.</p><div class="covers">${STYLES.map((s, i) => `<button data-cover="${i}"><div class="img"><img src="${st.covers[i]}" alt=""></div><span>${s}</span></button>`).join('')}</div>`);

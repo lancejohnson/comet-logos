@@ -205,7 +205,12 @@ def face_prompt(b, face):
 
 # ---------------------------------------------------------------- jobs
 def ddir(did): return os.path.join(DATA, 'designs', re.sub(r'[^a-z0-9]', '', did))
-def load(did): return json.load(open(os.path.join(ddir(did), 'design.json')))
+def load(did):
+    d = json.load(open(os.path.join(ddir(did), 'design.json')))
+    fix = lambda v: v.lstrip('/') if isinstance(v, str) and v.startswith('/files/') else v
+    d['faces'] = {k: fix(v) for k, v in (d.get('faces') or {}).items()}
+    if isinstance(d.get('covers'), list): d['covers'] = [fix(v) for v in d['covers']]
+    return d
 def save(did, d): json.dump(d, open(os.path.join(ddir(did), 'design.json'), 'w'), indent=1)
 LOCK = threading.Lock()
 
@@ -220,7 +225,7 @@ def run_job(tasks):
     threading.Thread(target=all_, daemon=True).start()
     return jid
 
-def file_url(did, name): return f'/files/{did}/{name}?v={int(time.time())}'
+def file_url(did, name): return f'files/{did}/{name}?v={int(time.time())}'
 
 def save_png_dataurl(s, path):
     m = re.match(r'data:image/\w+;base64,(.*)', s or '', re.S)
@@ -302,6 +307,29 @@ def route(body):
     out['urls'] = list(dict.fromkeys((out.get('urls') or []) + found))
     return out
 
+# ---------------------------------------------------------------- limits (public site: protect the ChatGPT plan)
+# per visitor: (max, seconds). Images per day across everyone is the hard ceiling.
+LIMITS = {'brief': [(8, 3600), (20, 86400)], 'covers': [(5, 3600), (12, 86400)], 'edit': [(15, 3600), (40, 86400)],
+          'chat': [(60, 3600)], 'faces': [(8, 3600), (20, 86400)], 'order': [(10, 3600)]}
+COST = {'covers': 3, 'faces': 3, 'edit': 2}  # images per call (edit is usually 1-2 pages)
+IMG_DAY = int(os.environ.get('COMET_IMAGES_PER_DAY', 360))
+HITS = {}; RL = threading.Lock()
+PROXY_KEY = (open(os.path.expanduser('~/.config/comet-chat/proxy-key')).read().strip()
+             if os.path.exists(os.path.expanduser('~/.config/comet-chat/proxy-key')) else '')
+def allow(ip, kind):
+    now = time.time()
+    with RL:
+        for (n, sec) in LIMITS.get(kind, []):
+            if len([t for t in HITS.get((ip, kind), []) if now - t < sec]) >= n:
+                return 'You’ve made a lot of designs in a short time. Call (804) 506-3291 and we’ll take it from here, or try again later.'
+        if kind in COST:
+            day = [t for t in HITS.get(('*', 'img'), []) if now - t < 86400]
+            if len(day) + COST[kind] > IMG_DAY:
+                return 'Our designer is very busy right now. Call (804) 506-3291 or email info@cometvid.com and we’ll design it for you.'
+            HITS[('*', 'img')] = day + [now] * COST[kind]
+        HITS[(ip, kind)] = [t for t in HITS.get((ip, kind), []) if now - t < 86400] + [now]
+    return None
+
 # ---------------------------------------------------------------- HTTP
 class H(BaseHTTPRequestHandler):
     def log_message(self, f, *a): pass
@@ -340,7 +368,13 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, body, ct if ct.startswith('image/') else 'image/svg+xml', 'max-age=3600')
             except Exception as e: return self.send(502, {'error': str(e)[:200]})
         self.send(404, {'error': 'not found'})
+    def ip(self):
+        if PROXY_KEY and self.headers.get('X-Comet-Proxy') == PROXY_KEY: return self.headers.get('X-Real-IP', '?')
+        return (self.headers.get('X-Forwarded-For') or self.client_address[0]).split(',')[0].strip()
     def do_POST(self):
+        kind = self.path.rsplit('/', 1)[-1]
+        why = allow(self.ip(), kind)
+        if why: return self.send(429, {'error': why})
         n = int(self.headers.get('Content-Length', 0))
         if n > 8_000_000: return self.send(413, {'error': 'too big'})
         try: body = json.loads(self.rfile.read(n) or b'{}')
@@ -353,7 +387,7 @@ class H(BaseHTTPRequestHandler):
             if self.path == '/api/faces': return self.send(200, {'job': start_faces(body)})
             if self.path == '/api/edit': return self.send(200, {'job': start_edit(body)})
             if self.path == '/api/order':
-                body['at'] = time.strftime('%Y-%m-%d %H:%M:%S'); body['ip'] = self.headers.get('X-Forwarded-For', self.client_address[0])
+                body['at'] = time.strftime('%Y-%m-%d %H:%M:%S'); body['ip'] = self.ip()
                 with open(os.path.join(DATA, 'orders.jsonl'), 'a') as f: f.write(json.dumps(body) + '\n')
                 return self.send(200, {'ok': True})
         except Exception as e:

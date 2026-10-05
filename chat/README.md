@@ -17,11 +17,19 @@ Typed messages go through a small router (`/api/chat`) that decides: design, edi
   Every design has a link: `/#d=<id>`.
 - **Prices are placeholders** (same tables as `site/pricing.html`).
 
+## Live at cometvid.com/design/
+
+The page uses relative paths, so it can sit under any folder. Caddy on wbg-apps (`/etc/caddy/sites/cometvid.caddy`,
+source in the `comet` repo) sends `cometvid.com/design/*` to agentbox through Tailscale Funnel on port 10000, adding
+`X-Comet-Proxy` (secret in `~/.config/comet-chat/proxy-key`) and `X-Real-IP` so the per-visitor limits see the real visitor.
+Limits live in `LIMITS` / `IMG_DAY` in `server.py` (default 360 images a day for everyone, about 50 designs).
+
 ## Run on agentbox
 
     git clone https://github.com/lancejohnson/comet-logos ~/apps/comet-logos
     ln -sf ~/apps/comet-logos/chat/comet-chat.service ~/.config/systemd/user/
     systemctl --user daemon-reload && systemctl --user enable --now comet-chat
-    tailscale serve --bg --https=8450 http://127.0.0.1:8131     # tailnet only
+    sudo tailscale serve --bg --https=8450 http://127.0.0.1:8131    # tailnet only
+    sudo tailscale funnel --bg --https=10000 http://127.0.0.1:8131  # public, for cometvid.com/design/
 
 Update: `git -C ~/apps/comet-logos pull && systemctl --user restart comet-chat`.
