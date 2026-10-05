@@ -320,7 +320,7 @@ function viewTwo() {
   st.root.rotation.set(Math.PI / 2, 0, 0); st.root.position.set(0, D / 2, 0);
   const wrap = new THREE.Group(); wrap.add(st.root); wrap.position.set(-2, 0, -13); wrap.rotation.y = -.55; scene.add(wrap); st.holder = wrap;
   st.target = st.angle = 2.2; st.playAt = performance.now() + 900;
-  setCam(isPhone ? [6, 40, 104] : [8, 22, 70], [0, 5, 0]);
+  setCam(isPhone ? [4, 24, 62] : [8, 22, 70], isPhone ? [-0.5, 5, 0] : [0, 5, 0]);
   onTap = b => { if (b === f) tapOpenClose(Math.PI)(b); else tapOpenClose(2.2)(b); };
   controls.autoRotate = false;
   hint.textContent = 'Drag to turn. Tap the closed one to open it.';
